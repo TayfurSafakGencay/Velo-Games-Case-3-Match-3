@@ -41,3 +41,9 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: BackgroundTile
+    uniqueID: 3775461403
+    locked: 0
+  - name: Object
+    uniqueID: 1739445479
+    locked: 0
