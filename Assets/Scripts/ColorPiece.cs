@@ -56,9 +56,9 @@ public class ColorPiece : MonoBehaviour
 
   public void SetColor(ColorType newColor)
   {
-    if (_colorSpriteDictionary.ContainsKey(newColor))
+    if (_colorSpriteDictionary.TryGetValue(newColor, out Sprite value))
     {
-      _sprite.sprite = _colorSpriteDictionary[newColor];
+      _sprite.sprite = value;
     }
   }
 }
