@@ -261,7 +261,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _height: 10
   _width: 6
-  _fillTime: 0.25
+  _fillTime: 0.1
   _piecePrefabs:
   - Type: 0
     Prefab: {fileID: 293417586470449758, guid: 4bc04e151b254dc47882897fe2f85ea3, type: 3}
@@ -269,6 +269,14 @@ MonoBehaviour:
     Prefab: {fileID: 8771840423264288335, guid: 0e087fc8ebde71d4ba12189bb24f1bc9, type: 3}
   - Type: 2
     Prefab: {fileID: 8771840423264288335, guid: 3192262998791e24680a5ea1e3cbfa5d, type: 3}
+  - Type: 3
+    Prefab: {fileID: 8771840423264288335, guid: bf5328e0762ba4b448cd468495688153, type: 3}
+  - Type: 4
+    Prefab: {fileID: 8771840423264288335, guid: 386c07e0233df9341a86d0eacfbacae4, type: 3}
+  - Type: 4
+    Prefab: {fileID: 8771840423264288335, guid: 386c07e0233df9341a86d0eacfbacae4, type: 3}
+  - Type: 5
+    Prefab: {fileID: 8771840423264288335, guid: a6896379c91e05f4fbadcd7552976c27, type: 3}
   _background: {fileID: 8117264516079029217, guid: 147636c2a2f3e374d97b533809f4aba8, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:

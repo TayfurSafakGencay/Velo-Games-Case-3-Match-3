@@ -32,14 +32,15 @@ public class ColorPiece : MonoBehaviour
 
   private Dictionary<ColorType, Sprite> _colorSpriteDictionary = new();
 
+  [SerializeField]
   private ColorType _color;
 
   public int ColorNumber => _colorSprites.Count;
 
-  public ColorType color
+  public ColorType Color
   {
     get => _color;
-    set => SetColor(value);
+    set => _color = value;
   }
 
   private void Awake()
@@ -56,9 +57,9 @@ public class ColorPiece : MonoBehaviour
 
   public void SetColor(ColorType newColor)
   {
-    if (_colorSpriteDictionary.TryGetValue(newColor, out Sprite value))
-    {
-      _sprite.sprite = value;
-    }
+    if (!_colorSpriteDictionary.TryGetValue(newColor, out Sprite value)) return;
+    
+    _sprite.sprite = value;
+    Color = newColor;
   }
 }
