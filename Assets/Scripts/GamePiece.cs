@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public class GamePiece : MonoBehaviour
@@ -36,11 +35,14 @@ public class GamePiece : MonoBehaviour
   public MovablePiece MovableComponent { get; private set; }
   
   public ColorPiece ColorComponent { get; private set; }
+  
+  public ClearablePiece ClearableComponent { get; private set; }
 
   private void Awake()
   {
     MovableComponent = gameObject.GetComponent<MovablePiece>();
     ColorComponent = gameObject.GetComponent<ColorPiece>();
+    ClearableComponent = gameObject.GetComponent<ClearablePiece>();
   }
 
   public void Init(int x, int y, Board board, Board.PieceType type)
@@ -75,5 +77,10 @@ public class GamePiece : MonoBehaviour
   public bool IsColored()
   {
     return ColorComponent != null;
+  }
+
+  public bool IsClearable()
+  {
+    return ClearableComponent != null;
   }
 }

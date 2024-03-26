@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -6,6 +7,8 @@ public class MovablePiece : MonoBehaviour
     private GamePiece _piece;
 
     private IEnumerator moveCoroutine;
+
+    public event Action OnMove;
 
     private void Awake()
     {
@@ -26,6 +29,8 @@ public class MovablePiece : MonoBehaviour
         _piece.X = newX;
         _piece.Y = newY;
         
+        _piece.name = $"({_piece.X}, {_piece.Y})";
+
         Vector2 startPos = transform.position;
         Vector2 endPos = _piece.BoardRef.GetWorldPosition(newX, newY);
 
@@ -36,5 +41,7 @@ public class MovablePiece : MonoBehaviour
         }
 
         _piece.transform.position = endPos;
+        
+        OnMove?.Invoke();
     }
 }
