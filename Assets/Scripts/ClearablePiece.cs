@@ -19,6 +19,8 @@ public class ClearablePiece : MonoBehaviour
 
     public virtual void Clear()
     {
+        _piece.BoardRef.Level.OnPieceCleared(_piece);
+        
         _isBeingCleared = true;
         
         transform.DOScale(transform.localScale * 1.5f, 1.25f).SetEase(Ease.OutQuad);
