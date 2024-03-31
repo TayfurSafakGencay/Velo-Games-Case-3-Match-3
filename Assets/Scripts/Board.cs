@@ -25,6 +25,16 @@ public class Board : MonoBehaviour
     public PieceType Type;
     public GameObject Prefab;
   }
+  
+  [Serializable]
+  public struct PiecePosition
+  {
+    public PieceType type;
+    public int x;
+    public int y;
+  }
+
+  public Level Level;
 
   [SerializeField]
   private int _height;
@@ -41,6 +51,8 @@ public class Board : MonoBehaviour
   [SerializeField]
   private GameObject _background;
 
+  public List<PiecePosition> initialPieces;
+
   private Dictionary<PieceType, GameObject> _piecePrefabsDictionary = new();
 
   private GamePiece[,] pieces;
@@ -51,7 +63,13 @@ public class Board : MonoBehaviour
 
   private GamePiece _enteredPiece;
 
-  private void Start()
+  private bool _gameOver;
+
+  private bool _isFilling;
+
+  public bool IsFilling => _isFilling;
+
+  private void Awake()
   {
     AddPrefabsToDictionary();
 
@@ -86,25 +104,25 @@ public class Board : MonoBehaviour
   {
     pieces = new GamePiece[_width, _height];
 
+    for (int i = 0; i < initialPieces.Count; i++)
+    {
+      if (initialPieces[i].x >= 0 && initialPieces[i].x < _width
+          && initialPieces[i].y >= 0 && initialPieces[i].y < _height)
+      {
+        SpawnNewPiece(initialPieces[i].x, initialPieces[i].y, initialPieces[i].type);
+      }
+    }
+    
     for (int x = 0; x < _width; x++)
     {
       for (int y = 0; y < _height; y++)
       {
-        SpawnNewPiece(x, y, PieceType.Empty);
+        if (pieces[x, y] == null)
+        {
+          SpawnNewPiece(x, y, PieceType.Empty);
+        }
       }
     }
-
-    Destroy(pieces[4, 4].gameObject);
-    SpawnNewPiece(4, 4, PieceType.Obstacle);
-    
-    Destroy(pieces[3, 4].gameObject);
-    SpawnNewPiece(3, 4, PieceType.Obstacle);
-    
-    Destroy(pieces[2, 4].gameObject);
-    SpawnNewPiece(2, 4, PieceType.Obstacle);
-    
-    Destroy(pieces[5, 4].gameObject);
-    SpawnNewPiece(5, 4, PieceType.Obstacle);
 
     StartCoroutine(Fill());
   }
@@ -129,6 +147,8 @@ public class Board : MonoBehaviour
   public IEnumerator Fill()
   {
     bool needsRefill = true;
+    _isFilling = true;
+    
     while (needsRefill)
     {
       yield return new WaitForSeconds(_fillTime);
@@ -141,6 +161,8 @@ public class Board : MonoBehaviour
 
       needsRefill = ClearAllValidMatches();
     }
+
+    _isFilling = false;
   }
 
   public bool FillStep()
@@ -244,6 +266,8 @@ public class Board : MonoBehaviour
 
   public void SwapPieces(GamePiece piece1, GamePiece piece2)
   {
+    if (_gameOver) return;
+    
     if (!piece1.IsMovable() || !piece2.IsMovable()) return;
 
     pieces[piece1.X, piece1.Y] = piece2;
@@ -296,6 +320,8 @@ public class Board : MonoBehaviour
       _pressedPiece = null;
 
       StartCoroutine(Fill());
+      
+      Level.OnMove();
     }
     else
     {
@@ -644,5 +670,43 @@ public class Board : MonoBehaviour
         }
       }
     }
+  }
+
+  public void GameOver()
+  {
+    _gameOver = true;
+  }
+
+  public List<GamePiece> GetTypeOfPieces(PieceType type)
+  {
+    List<GamePiece> gamePieces = new();
+
+    for (int x = 0; x < _width; x++)
+    {
+      for (int y = 0; y < _height; y++)
+      {
+        if (pieces[x, y].Type == type)
+        {
+          gamePieces.Add(pieces[x, y]);
+        }
+      }
+    }
+
+    return gamePieces;
+  }
+
+  public List<PiecePosition> GetInitialPieces(PieceType type)
+  {
+    List<PiecePosition> gamePieces = new();
+
+    for (int i = 0; i < initialPieces.Count; i++)
+    {
+      if (initialPieces[i].type == type)
+      {
+        gamePieces.Add(initialPieces[i]);
+      }
+    }
+
+    return gamePieces;
   }
 }
