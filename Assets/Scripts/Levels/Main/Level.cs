@@ -3,10 +3,11 @@ using BoardMain;
 using Panel;
 using Piece;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Levels.Main
 {
-    public class Level : MonoBehaviour
+    public abstract class Level : MonoBehaviour
     {
         public enum LevelType
         {
@@ -32,9 +33,14 @@ namespace Levels.Main
         protected LevelType Type {  get; set; }
     
         public bool DidWin { get; protected set; }
+        
+        public int LevelNumber { get; protected set; }
 
-        private void Start()
+        protected virtual void Start()
         {
+            char levelNumber = SceneManager.GetActiveScene().name[^1];
+            LevelNumber = (int)char.GetNumericValue(levelNumber);
+            
             Hud.SetScore(CurrentScore);
         }
 
@@ -67,14 +73,16 @@ namespace Levels.Main
             Hud.SetScore(CurrentScore);
         }
 
-        protected virtual IEnumerator WaitForGridFill()
+        protected IEnumerator WaitForGridFill()
         {
             while (Board.IsFilling)
             {
                 yield return 0;
             }
 
-            if (DidWin )
+            yield return new WaitForSeconds(0.25f);
+
+            if (DidWin)
             {
                 Hud.OnGameWin(CurrentScore);
             }

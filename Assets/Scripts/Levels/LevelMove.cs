@@ -14,8 +14,10 @@ namespace Levels
 
         private int _movesUsed = 0;
 
-        private void Start()
+        protected override void Start()
         {
+            base.Start();
+            
             Type = LevelType.Moves;
         
             Hud.SetLevelType(Type);

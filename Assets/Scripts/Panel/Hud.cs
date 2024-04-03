@@ -66,7 +66,7 @@ namespace Panel
         {
             for (int i = 0; i < _stars.Count; i++)
             {
-                _stars[i].enabled = _starIdx > i;
+                _stars[i].color = _starIdx > i ? Color.yellow : Color.gray;
             }
         }
 
@@ -89,13 +89,13 @@ namespace Panel
         {
             switch (levelType)
             {
-                case global::Levels.Main.Level.LevelType.Moves:
+                case Level.LevelType.Moves:
                     SetTitles("Moves Remaining", "Target Score");
                     break;
-                case global::Levels.Main.Level.LevelType.Obstacle:
+                case Level.LevelType.Obstacle:
                     SetTitles("Moves Remaining", "Obstacles Remaining");
                     break;
-                case global::Levels.Main.Level.LevelType.Timer:
+                case Level.LevelType.Timer:
                     SetTitles("Time Remaining", "Target Score");
                     break;
                 default:
@@ -111,17 +111,19 @@ namespace Panel
 
         public void OnGameWin(int score)
         {
-            GameOverPanel.OnGameWin(_starIdx, score);
+            GameOverPanel.OnGameWin(_starIdx, score, Level.LevelNumber);
 
-            if (_starIdx > PlayerPrefs.GetInt(SceneManager.GetActiveScene().ToString(), 0))
+            string levelName = SceneManager.GetActiveScene().name;
+
+            if (_starIdx > PlayerPrefs.GetInt(levelName, 0))
             {
-                PlayerPrefs.SetInt(SceneManager.GetActiveScene().ToString(), _starIdx);
+                PlayerPrefs.SetInt(levelName, _starIdx);
             }
         }
 
         public void OnGameLose(int score)
         {
-            GameOverPanel.OnGameLose(_starIdx, score);
+            GameOverPanel.OnGameLose(_starIdx, score, Level.LevelNumber);
         }
     }
 }

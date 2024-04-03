@@ -19,6 +19,8 @@ namespace Panel
 
         private int _score;
 
+        private int _level;
+
         private void Start()
         {
             gameObject.SetActive(false);
@@ -28,24 +30,26 @@ namespace Panel
         {
             for (int i = 0; i < _stars.Count; i++)
             {
-                _stars[i].enabled = starCount > i;
+                _stars[i].color = starCount > i ? Color.yellow : Color.gray;
             }
         }
 
-        public void OnGameWin(int star, int finalScore)
+        public void OnGameWin(int star, int finalScore, int level)
         {
             gameObject.SetActive(true);
         
+            _level = level;
             SetStars(star);
 
             _titleText.text = "You Win";
             _scoreText.text = finalScore.ToString();
         }
 
-        public void OnGameLose(int star, int finalScore)
+        public void OnGameLose(int star, int finalScore, int level)
         {
             gameObject.SetActive(true);
-        
+
+            _level = level;
             SetStars(star);
 
             _titleText.text = "You Lose";
@@ -57,9 +61,16 @@ namespace Panel
             SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         }
 
+        public void OnHome()
+        {
+            SceneManager.LoadScene("Level Select");
+            
+        }
+
         public void OnNextLevel()
         {
-        
+            int newLevel = _level + 1; 
+            SceneManager.LoadScene("Level " + newLevel);
         }
     }
 }
