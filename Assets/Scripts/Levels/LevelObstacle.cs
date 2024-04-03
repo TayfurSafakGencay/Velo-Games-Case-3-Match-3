@@ -1,4 +1,5 @@
-﻿using BoardMain;
+﻿using System.Collections;
+using BoardMain;
 using Piece;
 using UnityEngine;
 
@@ -17,8 +18,10 @@ namespace Levels
 
         private int _numberObstacleLeft;
 
-        private void Start()
+        protected override void Start()
         {
+            base.Start();
+            
             Type = LevelType.Obstacle;
         
             for (int i = 0; i < ObstacleTypes.Length; i++)
@@ -59,9 +62,16 @@ namespace Levels
                 
                 CurrentScore += 1000 * (_numberMoves - _movesUsed);
                 Hud.SetScore(CurrentScore);
-                    
-                GameWin();
+
+                StartCoroutine(WaitGameEnd());
             }
+        }
+
+        private IEnumerator WaitGameEnd()
+        {
+            yield return new WaitForSeconds(0.5f);
+            
+            GameWin();
         }
     }
 }
