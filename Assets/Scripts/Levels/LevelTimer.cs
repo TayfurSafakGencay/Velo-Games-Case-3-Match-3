@@ -15,26 +15,30 @@ namespace Levels
 
     private bool _timeFinished;
 
-    private void Start()
+    protected override void Start()
     {
+      base.Start();
+      
       Type = LevelType.Timer;
     
       Hud.SetLevelType(Type);
     
       Hud.SetTargetScore(_targetScore);
-      Hud.SetRemaining($"{_timeInSeconds / 60}:{_timeInSeconds % 60}");
-
+      
       _timer = _timeInSeconds;
     }
 
     private void Update()
     {
       if (_timeFinished)
+      {
+        Hud.SetRemaining("0:00");
         return;
+      }
     
       _timer -= Time.deltaTime;
 
-      Hud.SetRemaining($"{(int)Mathf.Max(_timer / 60, 0)}:{(int)Mathf.Max(_timer % 60, 0)}");
+      Hud.SetRemaining($"{Mathf.FloorToInt(_timer / 60)}:{Mathf.FloorToInt(_timer % 60):00}");
 
       if (!(_timer <= 0)) return;
       if (CurrentScore >= _targetScore)
