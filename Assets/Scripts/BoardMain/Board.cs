@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Levels.Main;
 using Piece;
+using Piece.Animation;
 using Unity.Mathematics;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -48,16 +49,19 @@ namespace BoardMain
 
     [SerializeField]
     private float _fillTime;
+    
+    [SerializeField]
+    private GameObject _background;
+
+    [SerializeField]
+    private CollectingPieceAnimation _collectingPieceAnimation;
 
     [SerializeField]
     private List<PiecePrefab> _piecePrefabs;
 
-    [SerializeField]
-    private GameObject _background;
-
     public List<PiecePosition> initialPieces;
 
-    private Dictionary<PieceType, GameObject> _piecePrefabsDictionary = new();
+    private readonly Dictionary<PieceType, GameObject> _piecePrefabsDictionary = new();
 
     private GamePiece[,] pieces;
 
@@ -72,6 +76,10 @@ namespace BoardMain
     private bool _isFilling;
 
     public bool IsFilling => _isFilling;
+
+    private bool _isSwapping;
+
+    private bool _objectDestroying;
 
     private void Awake()
     {
@@ -139,8 +147,7 @@ namespace BoardMain
 
     public GamePiece SpawnNewPiece(int x, int y, PieceType type)
     {
-      GameObject newPiece = Instantiate(_piecePrefabsDictionary[type], GetWorldPosition(x, y), quaternion.identity);
-      newPiece.transform.parent = transform;
+      GameObject newPiece = Instantiate(_piecePrefabsDictionary[type], GetWorldPosition(x, y), quaternion.identity, transform);
 
       pieces[x, y] = newPiece.GetComponent<GamePiece>();
       pieces[x, y].Init(x, y, this, type);
@@ -152,7 +159,12 @@ namespace BoardMain
     {
       bool needsRefill = true;
       _isFilling = true;
-    
+
+      while (_objectDestroying)
+      {
+        yield return 0;
+      }
+      
       while (needsRefill)
       {
         yield return new WaitForSeconds(_fillTime);
@@ -270,7 +282,7 @@ namespace BoardMain
 
     public void SwapPieces(GamePiece piece1, GamePiece piece2)
     {
-      if (_gameOver) return;
+      if (_gameOver || _isFilling || _isSwapping) return;
     
       if (!piece1.IsMovable() || !piece2.IsMovable()) return;
 
@@ -280,11 +292,13 @@ namespace BoardMain
       if (GetMatch(piece1, piece2.X, piece2.Y) != null || GetMatch(piece2, piece1.X, piece1.Y) != null
                                                        || piece1.Type == PieceType.Rainbow || piece2.Type == PieceType.Rainbow)
       {
+        _isSwapping = true;
+        
         int piece1X = piece1.X;
         int piece1Y = piece1.Y;
 
-        piece1.MovableComponent.Move(piece2.X, piece2.Y, _fillTime);
-        piece2.MovableComponent.Move(piece1X, piece1Y, _fillTime);
+        piece1.MovableComponent.Move(piece2.X, piece2.Y, 0.15f);
+        piece2.MovableComponent.Move(piece1X, piece1Y, 0.15f);
 
         if (piece1.Type == PieceType.Rainbow && piece1.IsClearable() && piece2.IsColored())
         {
@@ -326,12 +340,37 @@ namespace BoardMain
         StartCoroutine(Fill());
       
         Level.OnMove();
+
+        _isSwapping = false;
       }
       else
       {
-        pieces[piece1.X, piece1.Y] = piece1;
-        pieces[piece2.X, piece2.Y] = piece2;
+        StartCoroutine(InvalidSwap(piece1, piece2));
       }
+    }
+
+    private IEnumerator InvalidSwap(GamePiece piece1, GamePiece piece2)
+    {
+      _isSwapping = true;
+      
+      int piece1X = piece1.X;
+      int piece1Y = piece1.Y;
+      
+      int piece2X = piece2.X;
+      int piece2Y = piece2.Y;
+        
+      piece1.MovableComponent.Move(piece2X, piece2Y, 0.15f);
+      piece2.MovableComponent.Move(piece1X, piece1Y, 0.15f);
+      
+      yield return new WaitForSeconds(0.3f);
+      
+      piece1.MovableComponent.Move(piece1X, piece1Y, 0.15f);
+      piece2.MovableComponent.Move(piece2X, piece2Y, 0.15f);
+      
+      pieces[piece1.X, piece1.Y] = piece1;
+      pieces[piece2.X, piece2.Y] = piece2;
+      
+      _isSwapping = false;
     }
 
     public void PressPiece(GamePiece piece)
@@ -544,8 +583,11 @@ namespace BoardMain
           List<GamePiece> match = GetMatch(pieces[x, y], x, y);
 
           if (match == null) continue;
+          _objectDestroying = true;
+
           PieceType specialPieceType = PieceType.Count;
           GamePiece randomPiece = match[Random.Range(0, match.Count)];
+          
           int specialPieceX = randomPiece.X;
           int specialPieceY = randomPiece.Y;
 
@@ -571,32 +613,29 @@ namespace BoardMain
         
           for (int i = 0; i < match.Count; i++)
           {
-            if (ClearPiece(match[i].X, match[i].Y))
-            {
-              needsRefill = true;
+            if (!ClearPiece(match[i].X, match[i].Y)) continue;
+            needsRefill = true;
 
-              if (match[i] == _pressedPiece || match[i] == _enteredPiece)
-              {
-                specialPieceX = match[i].X;
-                specialPieceY = match[i].Y;
-              }
-            }
+            if (match[i] != _pressedPiece && match[i] != _enteredPiece) continue;
+            specialPieceX = match[i].X;
+            specialPieceY = match[i].Y;
           }
 
-          if (specialPieceType != PieceType.Count)
-          {
-            Destroy(pieces[specialPieceX, specialPieceY]);
-            GamePiece newPiece = SpawnNewPiece(specialPieceX, specialPieceY, specialPieceType);
+          if (specialPieceType == PieceType.Count) continue;
+          Destroy(pieces[specialPieceX, specialPieceY]);
+          GamePiece newPiece = SpawnNewPiece(specialPieceX, specialPieceY, specialPieceType);
 
-            if (specialPieceType == PieceType.RowClear || specialPieceType == PieceType.ColumnClear
-                && newPiece.IsColored() && match[0].IsColored())
-            {
-              newPiece.ColorComponent.SetColor(match[0].ColorComponent.Color);
-            }
-            else if (specialPieceType == PieceType.Rainbow && newPiece.IsColored())
-            {
-              newPiece.ColorComponent.SetColor(ColorPiece.ColorType.Any);
-            }
+          if (specialPieceType == PieceType.RowClear && newPiece.IsColored() && match[0].IsColored())
+          {
+            newPiece.ColorComponent.SetColor(ColorPiece.ColorType.Row);
+          }
+          else if (specialPieceType == PieceType.ColumnClear && newPiece.IsColored() && match[0].IsColored())
+          {
+            newPiece.ColorComponent.SetColor(ColorPiece.ColorType.Column);
+          }
+          else if (specialPieceType == PieceType.Rainbow && newPiece.IsColored())
+          {
+            newPiece.ColorComponent.SetColor(ColorPiece.ColorType.Any);
           }
         }
       }
@@ -606,17 +645,29 @@ namespace BoardMain
 
     public bool ClearPiece(int x, int y)
     {
-      if (pieces[x, y].IsClearable() && !pieces[x, y].ClearableComponent.IsBeingCleared)
-      {
-        pieces[x, y].ClearableComponent.Clear();
-        SpawnNewPiece(x, y, PieceType.Empty);
+      GamePiece piece = pieces[x, y];
+
+      if (!piece.IsClearable() || piece.ClearableComponent.IsBeingCleared) return false;
       
-        ClearObstacles(x, y);
+      _objectDestroying = true;
+      piece.ClearableComponent.Clear();
 
-        return true;
-      }
+      StartCoroutine(StartDestroyAnimation(piece));  
+      
+      SpawnNewPiece(x, y, PieceType.Empty);
+      ClearObstacles(x, y);
 
-      return false;
+      FinishDestroyingObjectCallers();
+
+      return true;
+    }
+
+    private IEnumerator StartDestroyAnimation(GamePiece piece)
+    {
+      yield return new WaitForSeconds(0.15f);
+
+      Vector3 objectPosition = piece.transform.position;
+      _collectingPieceAnimation.AddObjects(objectPosition, piece);
     }
 
     public void ClearObstacles(int x, int y)
@@ -648,22 +699,34 @@ namespace BoardMain
 
     public void ClearRow(int row)
     {
+      _objectDestroying = true;
+
       for (int x = 0; x < _width; x++)
       {
         ClearPiece(x, row);
+        
+        if(x != _width -1) continue;
+        FinishDestroyingObjectCallers();
       }
     }
 
     public void ClearColumn(int column)
     {
+      _objectDestroying = true;
+
       for (int y = 0; y < _height; y++)
       {
         ClearPiece(column, y);
+        
+        if(y != _height -1) continue;
+        FinishDestroyingObjectCallers();
       }
     }
 
     public void ClearColor(ColorPiece.ColorType color)
     {
+      _objectDestroying = true;
+
       for (int x = 0; x < _width; x++)
       {
         for (int y = 0; y < _height; y++)
@@ -672,8 +735,41 @@ namespace BoardMain
           {
             ClearPiece(x, y);
           }
+
+          if (x == _width - 1 && y == _height -1)
+          {
+            FinishDestroyingObjectCallers();
+          }
         }
       }
+    }
+
+    private const float _destroyingObjectTime = 0.5f;
+
+    private void FinishDestroyingObjectCallers()
+    {
+      StopCoroutine(FinishDestroyingObject());
+
+      StartCoroutine(FinishDestroyingObject());
+    }
+
+    private IEnumerator FinishDestroyingObject()
+    {
+      yield return new WaitForSeconds(_destroyingObjectTime);
+
+      _objectDestroying = false;
+    }
+
+    private IEnumerator ChangeFillTime(float fillTime, float newFillTime = 0.1f)
+    {
+      _fillTime = fillTime;
+      
+      yield return new WaitForSeconds(0.25f);
+      
+      while (IsFilling)
+        yield return 0;
+      
+      _fillTime = newFillTime;
     }
 
     public void GameOver()
