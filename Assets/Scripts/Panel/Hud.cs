@@ -1,5 +1,7 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using DG.Tweening;
 using Levels.Main;
 using TMPro;
 using UnityEngine;
@@ -37,29 +39,71 @@ namespace Panel
 
         private int _starIdx;
 
+        private float _newScore;
+
         private void Start()
         {
             SetStars();
+
+            _currentScoreText.text = 0.ToString();
         }
 
         public void SetScore(int score)
         {
-            _currentScoreText.text = score.ToString();
-
-            if (score >= Level.ScoreThirdStar)
+            StartCoroutine(CountUpToTarget(score));
+            
+            if (_newScore >= Level.ScoreThirdStar)
             {
                 _starIdx = 3;
             }
-            else if (score >= Level.ScoreSecondStar)
+            else if (_newScore >= Level.ScoreSecondStar)
             {
                 _starIdx = 2;
             }
-            else if (score >= Level.ScoreFirstStar)
+            else if (_newScore >= Level.ScoreFirstStar)
             {
                 _starIdx = 1;
             }
         
             SetStars();
+        }
+
+        private const float _targetScale = 1.25f;
+
+        private const float _duration = 0.5f;
+
+        private const Ease _ease = Ease.InFlash;
+
+        private bool _isContinuousCount;
+
+        private float _speed = 1f;
+        
+        private IEnumerator CountUpToTarget(int score)
+        {
+            _currentScoreText.transform.DOScale(_targetScale, _duration).SetEase(_ease).OnComplete(() =>
+            {
+                _currentScoreText.transform.DOScale(Vector3.one, _duration).SetEase(_ease);
+            });
+
+            if (!_isContinuousCount)
+                _speed = 1f;
+            
+            while (_newScore < score)
+            {
+                _isContinuousCount = true;
+                
+                _speed += 1f;
+                _newScore += Time.deltaTime * _speed;
+                
+                _newScore = Mathf.Clamp(_newScore, 0, score);
+                _currentScoreText.text = _newScore.ToString("f0");
+                
+                yield return null;
+            }
+
+            _isContinuousCount = false;
+            
+            _newScore = score;
         }
 
         private void SetStars()

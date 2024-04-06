@@ -47,3 +47,6 @@ TagManager:
   - name: Object
     uniqueID: 1739445479
     locked: 0
+  - name: CollectingObject
+    uniqueID: 188631463
+    locked: 0

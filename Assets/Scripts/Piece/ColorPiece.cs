@@ -12,12 +12,12 @@ namespace Piece
       Orange,
       Yellow,
       Green,
-      Black,
       Blue,
-      White,
       Pink,
       Any,
-      Count
+      Count,
+      Row,
+      Column,
     }
   
     [Serializable]
@@ -48,6 +48,7 @@ namespace Piece
     private void Awake()
     {
       _sprite = gameObject.GetComponent<SpriteRenderer>();
+      
       for (int i = 0; i < _colorSprites.Count; i++)
       {
         if (!_colorSpriteDictionary.ContainsKey(_colorSprites[i].Color))
@@ -59,7 +60,12 @@ namespace Piece
 
     public void SetColor(ColorType newColor)
     {
-      if (!_colorSpriteDictionary.TryGetValue(newColor, out Sprite value)) return;
+      if (!_colorSpriteDictionary.TryGetValue(newColor, out Sprite value))
+      {
+        
+        print(newColor);
+        return;
+      }
     
       _sprite.sprite = value;
       Color = newColor;
