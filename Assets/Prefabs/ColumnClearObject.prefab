@@ -15,7 +15,6 @@ GameObject:
   - component: {fileID: -1300855292237277486}
   - component: {fileID: 1490786747442583068}
   - component: {fileID: 8335861806563444821}
-  - component: {fileID: 4048740683835001255}
   - component: {fileID: 8510716369522727511}
   m_Layer: 5
   m_Name: ColumnClearObject
@@ -34,7 +33,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.15, y: 0.15, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -96,7 +95,7 @@ SpriteRenderer:
   m_Size: {x: 8, y: 6.26}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!114 &-6991537871184798059
@@ -138,17 +137,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _colorSprites:
   - Color: 0
-    Sprite: {fileID: 5978898516894778253, guid: 17c558ddb31742c42894aa507b18c308, type: 3}
-  - Color: 7
-    Sprite: {fileID: -7679294837404564279, guid: 9176962214b43bc45ae68c2f7bc7b380, type: 3}
-  - Color: 5
-    Sprite: {fileID: 1111546806721587337, guid: 0c6b4087be1c8984989b77955f1cc287, type: 3}
+    Sprite: {fileID: 21300000, guid: 88af6082a4f6bce4b862a30a07745334, type: 3}
   - Color: 1
-    Sprite: {fileID: -6907072107442916967, guid: 6ac408124b4fe5f49ac61db2bf90a89f, type: 3}
+    Sprite: {fileID: 21300000, guid: f50dead24d167cd4ebd48714ee86ec2c, type: 3}
   - Color: 2
-    Sprite: {fileID: -7266125404717315652, guid: 564918fc2b04dd64aa99ffe8c6dac7e6, type: 3}
+    Sprite: {fileID: 21300000, guid: b5bf5ffb759daf54ab28ecbd2244f3f3, type: 3}
   - Color: 3
-    Sprite: {fileID: -6768197780842453128, guid: e26a2c05e27d57549a953cfe91b2745c, type: 3}
+    Sprite: {fileID: 21300000, guid: 6ca6db1d8b8558547bb86ea87061ac59, type: 3}
+  - Color: 4
+    Sprite: {fileID: 21300000, guid: 632d0f498e8d6a64983643462104396d, type: 3}
+  - Color: 5
+    Sprite: {fileID: 21300000, guid: b818e604437b42c48a24f3bd78c66d72, type: 3}
+  - Color: 8
+    Sprite: {fileID: 21300000, guid: 5d35855a77712c9408cab908d01dbe09, type: 3}
+  - Color: 9
+    Sprite: {fileID: 21300000, guid: 068640a237c54b14d87cb8a89828ecd1, type: 3}
   _color: 0
 --- !u!114 &8335861806563444821
 MonoBehaviour:
@@ -163,18 +166,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   IsRow: 0
---- !u!114 &4048740683835001255
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8771840423264288335}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5625a5898dd41074e981a17a10c5d44b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!61 &8510716369522727511
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -218,5 +209,5 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 6, y: 6}
+  m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0

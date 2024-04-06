@@ -23,21 +23,25 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &6330635723475762226
-Transform:
+--- !u!224 &6330635723475762226
+RectTransform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8771840423264288335}
-  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.15, y: 0.15, z: 1}
+  m_LocalScale: {x: 1.5, y: 1.5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 1, y: 1}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1946818491693047347
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -95,7 +99,7 @@ SpriteRenderer:
   m_Size: {x: 8, y: 6.26}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!114 &-6991537871184798059
@@ -137,17 +141,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _colorSprites:
   - Color: 0
-    Sprite: {fileID: 5978898516894778253, guid: 17c558ddb31742c42894aa507b18c308, type: 3}
-  - Color: 7
-    Sprite: {fileID: -7679294837404564279, guid: 9176962214b43bc45ae68c2f7bc7b380, type: 3}
-  - Color: 5
-    Sprite: {fileID: 1111546806721587337, guid: 0c6b4087be1c8984989b77955f1cc287, type: 3}
+    Sprite: {fileID: 21300000, guid: 88af6082a4f6bce4b862a30a07745334, type: 3}
   - Color: 1
-    Sprite: {fileID: -6907072107442916967, guid: 6ac408124b4fe5f49ac61db2bf90a89f, type: 3}
+    Sprite: {fileID: 21300000, guid: f50dead24d167cd4ebd48714ee86ec2c, type: 3}
   - Color: 2
-    Sprite: {fileID: -7266125404717315652, guid: 564918fc2b04dd64aa99ffe8c6dac7e6, type: 3}
+    Sprite: {fileID: 21300000, guid: b5bf5ffb759daf54ab28ecbd2244f3f3, type: 3}
   - Color: 3
-    Sprite: {fileID: -6768197780842453128, guid: e26a2c05e27d57549a953cfe91b2745c, type: 3}
+    Sprite: {fileID: 21300000, guid: 6ca6db1d8b8558547bb86ea87061ac59, type: 3}
+  - Color: 4
+    Sprite: {fileID: 21300000, guid: 632d0f498e8d6a64983643462104396d, type: 3}
+  - Color: 5
+    Sprite: {fileID: 21300000, guid: b818e604437b42c48a24f3bd78c66d72, type: 3}
   _color: 0
 --- !u!114 &4487855510572299118
 MonoBehaviour:
@@ -204,5 +208,5 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 6, y: 6}
+  m_Size: {x: 0.65, y: 0.65}
   m_EdgeRadius: 0
