@@ -75,26 +75,30 @@ namespace Piece.Animation
 
         private void AnimateObject(Vector3 objectPosition, GamePiece piece)
         {
-            ColorPiece.ColorType color = piece.ColorComponent.Color;
-            
-            if(!_objectQueues.ContainsKey(color)) return;
-
-            if (_objectQueues[color].Count <= 0) return;
-            
-            GameObject animatedObject = _objectQueues[color].Dequeue();
-            
-                
-            animatedObject.SetActive(true);
-            animatedObject.transform.position = objectPosition;
-            
-            float duration = Random.Range(_minDuration, _maxDuration);
-            animatedObject.transform.DOMove(_targetPosition, duration).SetEase(_easeType).OnComplete(() =>
-            {
-                animatedObject.SetActive(false);
-                _objectQueues[color].Enqueue(animatedObject);
-                
-                piece.BoardRef.Level.OnPieceCleared(piece);
-            });
+            // if (piece.ColorComponent == null)
+            // {
+            //     return;
+            // }
+            // ColorPiece.ColorType color = piece.ColorComponent.Color;
+            //
+            // if(!_objectQueues.ContainsKey(color)) return;
+            //
+            // if (_objectQueues[color].Count <= 0) return;
+            //
+            // GameObject animatedObject = _objectQueues[color].Dequeue();
+            //
+            //     
+            // animatedObject.SetActive(true);
+            // animatedObject.transform.position = objectPosition;
+            //
+            // float duration = Random.Range(_minDuration, _maxDuration);
+            // animatedObject.transform.DOMove(_targetPosition, duration).SetEase(_easeType).OnComplete(() =>
+            // {
+            //     animatedObject.SetActive(false);
+            //     _objectQueues[color].Enqueue(animatedObject);
+            //     
+            //     piece.BoardRef.Level.OnPieceCleared(piece);
+            // });
         }
 
         public void AddObjects(Vector3 objectPosition, GamePiece piece)

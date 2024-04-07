@@ -4,10 +4,10 @@ namespace Piece
   {
     public bool IsRow;
 
-    public override void Clear()
+    public override bool Clear()
     {
       base.Clear();
-
+      
       if (IsRow)
       {
         _piece.BoardRef.ClearRow(_piece.Y);
@@ -16,6 +16,8 @@ namespace Piece
       {
         _piece.BoardRef.ClearColumn(_piece.X);
       }
+
+      return true;
     }
   }
 }

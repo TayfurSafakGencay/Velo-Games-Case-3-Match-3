@@ -1,14 +1,14 @@
 namespace Piece
 {
-    public class RainbowPiece : ClearablePiece
-    {
-        public ColorPiece.ColorType Color { get; set; }
+  public class RainbowPiece : ClearablePiece
+  {
+    public ColorPiece.ColorType Color { get; set; }
 
-        public override void Clear()
-        {
-            base.Clear();
-        
-            _piece.BoardRef.ClearColor(Color);
-        }
+    public override bool Clear()
+    {
+      _piece.BoardRef.ClearColor(Color);
+
+      return base.Clear();
     }
+  }
 }

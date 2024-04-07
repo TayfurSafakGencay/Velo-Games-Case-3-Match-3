@@ -11,7 +11,7 @@ namespace Piece
 
         protected GamePiece _piece;
 
-        private SpriteRenderer _spriteRenderer;
+        protected SpriteRenderer _spriteRenderer;
 
         private void Awake()
         {
@@ -19,16 +19,18 @@ namespace Piece
             _spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
         }
 
-        public virtual void Clear()
+        public virtual bool Clear()
         {
             _isBeingCleared = true;
         
-            transform.DOScale(transform.localScale * 1.5f, 1.25f).SetEase(Ease.OutQuad);
+            transform.DOScale(transform.localScale * 1.5f, 1f).SetEase(Ease.OutQuad);
 
-            _spriteRenderer.DOFade(0f, 1.25f).SetEase(Ease.OutQuad).OnComplete(() =>
+            _spriteRenderer.DOFade(0f, 1f).SetEase(Ease.OutQuad).OnComplete(() =>
             {
                 Destroy(gameObject);
             });
+
+            return true;
         }
     }
 }

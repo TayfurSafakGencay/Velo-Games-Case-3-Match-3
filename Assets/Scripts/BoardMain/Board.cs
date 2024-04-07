@@ -655,7 +655,7 @@ namespace BoardMain
       StartCoroutine(StartDestroyAnimation(piece));  
       
       SpawnNewPiece(x, y, PieceType.Empty);
-      ClearObstacles(x, y);
+      // ClearObstacles(x, y);
 
       FinishDestroyingObjectCallers();
 
@@ -679,8 +679,12 @@ namespace BoardMain
           GamePiece piece = pieces[adjacentX, y];
           if (piece.Type != PieceType.Obstacle || !piece.IsClearable()) continue;
         
-          piece.ClearableComponent.Clear();
-          SpawnNewPiece(adjacentX, y, PieceType.Empty);
+          bool isCleared = piece.ClearableComponent.Clear();
+
+          if (isCleared)
+          {
+            SpawnNewPiece(x, adjacentX, PieceType.Empty);
+          }
         }
       }
 
@@ -691,8 +695,12 @@ namespace BoardMain
           GamePiece piece = pieces[x, adjacentY];
           if (piece.Type != PieceType.Obstacle || !piece.IsClearable()) continue;
 
-          piece.ClearableComponent.Clear();
-          SpawnNewPiece(x, adjacentY, PieceType.Empty);
+          bool isCleared = piece.ClearableComponent.Clear();
+
+          if (isCleared)
+          {
+            SpawnNewPiece(x, adjacentY, PieceType.Empty);
+          }
         }
       }
     }
