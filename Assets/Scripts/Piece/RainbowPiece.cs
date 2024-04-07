@@ -8,7 +8,7 @@ namespace Piece
     {
       base.Clear();
 
-      _piece.BoardRef.ClearColor(Color);
+      _piece.BoardRef.RainBow(Color);
 
       return true;
     }

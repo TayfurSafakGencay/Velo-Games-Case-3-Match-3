@@ -21,6 +21,7 @@ namespace BoardMain
       RowClear,
       ColumnClear,
       Rainbow,
+      Bomb,
       Count
     }
 
@@ -280,6 +281,7 @@ namespace BoardMain
              || (piece1.Y == piece2.Y && Mathf.Abs(piece1.X - piece2.X) == 1);
     }
 
+    private const float _swapPieceTime = 0.15f;
     public void SwapPieces(GamePiece piece1, GamePiece piece2)
     {
       if (_gameOver || _isFilling || _isSwapping) return;
@@ -297,8 +299,8 @@ namespace BoardMain
         int piece1X = piece1.X;
         int piece1Y = piece1.Y;
 
-        piece1.MovableComponent.Move(piece2.X, piece2.Y, 0.15f);
-        piece2.MovableComponent.Move(piece1X, piece1Y, 0.15f);
+        piece1.MovableComponent.Move(piece2.X, piece2.Y, _swapPieceTime);
+        piece2.MovableComponent.Move(piece1X, piece1Y, _swapPieceTime);
 
         if (piece1.Type == PieceType.Rainbow && piece1.IsClearable() && piece2.IsColored())
         {
@@ -359,13 +361,13 @@ namespace BoardMain
       int piece2X = piece2.X;
       int piece2Y = piece2.Y;
         
-      piece1.MovableComponent.Move(piece2X, piece2Y, 0.15f);
-      piece2.MovableComponent.Move(piece1X, piece1Y, 0.15f);
+      piece1.MovableComponent.Move(piece2X, piece2Y, _swapPieceTime);
+      piece2.MovableComponent.Move(piece1X, piece1Y, _swapPieceTime);
       
       yield return new WaitForSeconds(0.3f);
       
-      piece1.MovableComponent.Move(piece1X, piece1Y, 0.15f);
-      piece2.MovableComponent.Move(piece2X, piece2Y, 0.15f);
+      piece1.MovableComponent.Move(piece1X, piece1Y, _swapPieceTime);
+      piece2.MovableComponent.Move(piece2X, piece2Y, _swapPieceTime);
       
       pieces[piece1.X, piece1.Y] = piece1;
       pieces[piece2.X, piece2.Y] = piece2;
@@ -608,7 +610,7 @@ namespace BoardMain
           }
           else if (match.Count >= 5)
           {
-            specialPieceType = PieceType.Rainbow;
+            specialPieceType = CheckRainbowOrBomb(match);
           }
         
           for (int i = 0; i < match.Count; i++)
@@ -643,6 +645,32 @@ namespace BoardMain
       return needsRefill;
     }
 
+    public PieceType CheckRainbowOrBomb(List<GamePiece> matches)
+    {
+      int xCount = 0;
+      int yCount = 0;
+      
+      for (int i = 0; i < matches.Count - 1; i++)
+      {
+        if (matches[i].X == matches[i + 1].X)
+        {
+          xCount++;
+        }
+
+        if (matches[i].Y == matches[i + 1].Y)
+        {
+          yCount++;
+        }
+      }
+
+      if (xCount >= 4 || yCount >= 4)
+      {
+        return PieceType.Rainbow;
+      }
+      
+      return PieceType.Bomb;
+    }
+
     public bool ClearPiece(int x, int y)
     {
       GamePiece piece = pieces[x, y];
@@ -667,7 +695,7 @@ namespace BoardMain
 
     private IEnumerator StartDestroyAnimation(GamePiece piece)
     {
-      yield return new WaitForSeconds(0.15f);
+      yield return new WaitForSeconds(_swapPieceTime);
 
       Vector3 objectPosition = piece.transform.position;
       _collectingPieceAnimation.AddObjects(objectPosition, piece);
@@ -708,7 +736,7 @@ namespace BoardMain
       }
     }
 
-    public void ClearRow(int row)
+    public void RowRocket(int row)
     {
       _objectDestroying = true;
 
@@ -721,7 +749,7 @@ namespace BoardMain
       }
     }
 
-    public void ClearColumn(int column)
+    public void ColumnRocket(int column)
     {
       _objectDestroying = true;
 
@@ -734,7 +762,7 @@ namespace BoardMain
       }
     }
 
-    public void ClearColor(ColorPiece.ColorType color)
+    public void RainBow(ColorPiece.ColorType color)
     {
       _objectDestroying = true;
 
@@ -751,6 +779,45 @@ namespace BoardMain
           {
             FinishDestroyingObjectCallers();
           }
+        }
+      }
+    }
+
+    public void Bomb(int x, int y)
+    {
+      print(x + "   " + y);
+
+      for (int adjacentX = x - 1; adjacentX <= x + 1; adjacentX++)
+      {
+        if (adjacentX == x || adjacentX < 0 || adjacentX >= _width) continue;
+
+        for (int adjacentY = y - 1; adjacentY <= y + 1; adjacentY++)
+        {
+          if (adjacentY == y || adjacentY < 0 || adjacentY >= _height) continue;
+          
+          print(x + "     " + y);
+          
+          // GamePiece piece = pieces[adjacentX, adjacentY];
+          //
+          // if (piece.Type == PieceType.Normal)
+          // {
+          //   
+          // }
+          // else if (piece.Type == PieceType.Obstacle)
+          // {
+          //   bool isCleared = piece.ClearableComponent.Clear();
+          //
+          //   if (isCleared)
+          //     SpawnNewPiece(adjacentX, y, PieceType.Empty);
+          // }
+          // else if (piece.Type == PieceType.Rainbow)
+          // {
+          //   
+          // }
+          // else if (piece.Type == PieceType.Bomb)
+          // {
+          //   
+          // }
         }
       }
     }

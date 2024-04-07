@@ -10,11 +10,11 @@ namespace Piece
       
       if (IsRow)
       {
-        _piece.BoardRef.ClearRow(_piece.Y);
+        _piece.BoardRef.RowRocket(_piece.Y);
       }
       else
       {
-        _piece.BoardRef.ClearColumn(_piece.X);
+        _piece.BoardRef.ColumnRocket(_piece.X);
       }
 
       return true;
