@@ -23,7 +23,9 @@ namespace Piece
 
       if (_health == 0)
       {
-        return base.Clear();
+        base.Clear();
+        
+        return true;
       }
 
       _spriteRenderer.sprite = _sprites[_health - 1];

@@ -936,29 +936,20 @@ MonoBehaviour:
     Prefab: {fileID: 8771840423264288335, guid: a6896379c91e05f4fbadcd7552976c27, type: 3}
   initialPieces:
   - type: 2
-    x: 1
-    y: 1
-  - type: 2
-    x: 2
-    y: 2
-  - type: 2
     x: 3
     y: 3
   - type: 2
     x: 4
     y: 4
   - type: 2
-    x: 6
-    y: 2
-  - type: 2
-    x: 6
+    x: 5
     y: 6
   - type: 2
-    x: 9
-    y: 5
+    x: 2
+    y: 1
   - type: 2
-    x: 8
-    y: 7
+    x: 7
+    y: 3
 --- !u!1 &1614536844
 GameObject:
   m_ObjectHideFlags: 0

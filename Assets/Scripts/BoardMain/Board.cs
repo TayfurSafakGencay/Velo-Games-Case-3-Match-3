@@ -652,10 +652,13 @@ namespace BoardMain
       _objectDestroying = true;
       piece.ClearableComponent.Clear();
 
-      StartCoroutine(StartDestroyAnimation(piece));  
+      if (piece.Type == PieceType.Normal)
+      {
+        StartCoroutine(StartDestroyAnimation(piece));  
+      }
       
       SpawnNewPiece(x, y, PieceType.Empty);
-      // ClearObstacles(x, y);
+      ClearObstacles(x, y);
 
       FinishDestroyingObjectCallers();
 
@@ -680,10 +683,10 @@ namespace BoardMain
           if (piece.Type != PieceType.Obstacle || !piece.IsClearable()) continue;
         
           bool isCleared = piece.ClearableComponent.Clear();
-
+          
           if (isCleared)
           {
-            SpawnNewPiece(x, adjacentX, PieceType.Empty);
+            SpawnNewPiece(adjacentX, y, PieceType.Empty);
           }
         }
       }

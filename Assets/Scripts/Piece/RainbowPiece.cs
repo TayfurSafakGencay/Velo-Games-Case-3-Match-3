@@ -6,9 +6,11 @@ namespace Piece
 
     public override bool Clear()
     {
+      base.Clear();
+
       _piece.BoardRef.ClearColor(Color);
 
-      return base.Clear();
+      return true;
     }
   }
 }
