@@ -17,7 +17,7 @@ GameObject:
   - component: {fileID: 8335861806563444821}
   - component: {fileID: 8510716369522727511}
   m_Layer: 5
-  m_Name: ColumnClearObject
+  m_Name: RocketColumnObject
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -120,6 +120,8 @@ MonoBehaviour:
     Sprite: {fileID: 21300000, guid: 83ba289765390a246a27777e5328c752, type: 3}
   - PieceType: 7
     Sprite: {fileID: 21300000, guid: cebab9a273177194abf57c253f5f3357, type: 3}
+  - PieceType: 8
+    Sprite: {fileID: 21300000, guid: cebab9a273177194abf57c253f5f3357, type: 3}
   - PieceType: 5
     Sprite: {fileID: 21300000, guid: d96c85e61f5ca794cb50593cdfaf3b68, type: 3}
 --- !u!114 &-1300855292237277486
@@ -148,7 +150,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _colorSprites:
   - Color: 6
-    Sprite: {fileID: 21300000, guid: 068640a237c54b14d87cb8a89828ecd1, type: 3}
+    Sprite: {fileID: 21300000, guid: 9f891ed2bd23890428deb18cf4fb8f73, type: 3}
   _color: 6
 --- !u!114 &8335861806563444821
 MonoBehaviour:

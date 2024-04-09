@@ -880,17 +880,18 @@ namespace BoardMain
       }
       else if (anotherPiece.PieceType == PieceType.Bomb)
       {
-        
+        GamePiece superRocketPiece = DestroyAndCreateNewPiece(bombPiece, bombPiece.X, bombPiece.Y, PieceType.SuperBomb, ColorType.Any);
+        superRocketPiece.ClearableComponent.Clear();
       }
     }
 
-    public void ClearBomb(GamePiece bombPiece)
+    public void ClearBomb(GamePiece bombPiece, int radius = 1)
     {
-      for (int adjacentX = bombPiece.X - 1; adjacentX <= bombPiece.X + 1; adjacentX++)
+      for (int adjacentX = bombPiece.X - radius; adjacentX <= bombPiece.X + radius; adjacentX++)
       {
         if (adjacentX < 0 || adjacentX >= _width) continue;
 
-        for (int adjacentY = bombPiece.Y - 1; adjacentY <= bombPiece.Y + 1; adjacentY++)
+        for (int adjacentY = bombPiece.Y - radius; adjacentY <= bombPiece.Y + radius; adjacentY++)
         {
           if (adjacentY < 0 || adjacentY >= _height) continue;
           ClearPiece(adjacentX, adjacentY);

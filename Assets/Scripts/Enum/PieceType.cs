@@ -10,6 +10,7 @@
     SuperRocket,
     Rainbow,
     Bomb,
+    SuperBomb,
     Count
   }
 }

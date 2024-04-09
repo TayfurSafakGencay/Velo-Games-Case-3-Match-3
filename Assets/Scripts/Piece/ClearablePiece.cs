@@ -52,7 +52,7 @@ namespace Piece
 
         protected void ExplosionAnimation()
         {
-            _explosionEffect = transform.DOScale(Vector3.one * 1.25f, 0.25f)
+            _explosionEffect = transform.DOScale(transform.localScale * 1.25f, 0.25f)
                 .SetLoops(-1, LoopType.Yoyo) 
                 .SetEase(Ease.InOutSine);
         }

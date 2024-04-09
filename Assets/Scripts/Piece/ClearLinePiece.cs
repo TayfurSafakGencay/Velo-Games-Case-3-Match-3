@@ -1,7 +1,5 @@
 using System.Collections;
 using DG.Tweening;
-using DG.Tweening.Core;
-using DG.Tweening.Plugins.Options;
 using Enum;
 using UnityEngine;
 

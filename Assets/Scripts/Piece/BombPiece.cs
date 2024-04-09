@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using DG.Tweening;
+using Enum;
 using UnityEngine;
 
 namespace Piece
@@ -20,8 +21,9 @@ namespace Piece
       yield return new WaitForSeconds(time);
       
       _explosionEffect.Kill();
-
-      _piece.BoardRef.ClearBomb(_piece);
+      
+      int radius = _piece.PieceType == PieceType.SuperBomb ? 3 : 1;
+      _piece.BoardRef.ClearBomb(_piece, radius);
       
       _piece.BoardRef.Fillers();
       

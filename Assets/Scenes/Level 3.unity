@@ -938,6 +938,8 @@ MonoBehaviour:
     Prefab: {fileID: 8771840423264288335, guid: a6896379c91e05f4fbadcd7552976c27, type: 3}
   - Type: 7
     Prefab: {fileID: 8771840423264288335, guid: c9bf63d208339b5438ba229973a33cdb, type: 3}
+  - Type: 8
+    Prefab: {fileID: 8771840423264288335, guid: 71b8aa95c5dd16d4f83d26c321072930, type: 3}
   _initialPieces: []
 --- !u!1 &1614536844
 GameObject:
