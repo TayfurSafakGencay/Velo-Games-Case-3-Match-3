@@ -288,26 +288,12 @@ namespace BoardMain
         {
           matchKey = MatchKey.Rainbow;
           
-          RainbowPiece rainbowPiece = piece1.GetComponent<RainbowPiece>();
-
-          if (rainbowPiece)
-          {
-            rainbowPiece.SetRainbowItems(piece1, piece2); 
-          }
-
           RainbowSuper(piece1, piece2);
         }
         else if (piece2.PieceType == PieceType.Rainbow && piece2.IsClearable() && piece1.IsColored())
         {
           matchKey = MatchKey.Rainbow;
           
-          RainbowPiece rainbowPiece = piece2.GetComponent<RainbowPiece>();
-
-          if (rainbowPiece)
-          {
-            rainbowPiece.SetRainbowItems(piece2, piece1); 
-          }
-
           RainbowSuper(piece2, piece1);
         }
 
@@ -338,6 +324,7 @@ namespace BoardMain
           else if (piece2.PieceType == PieceType.Bomb)
           {
             matchKey = MatchKey.Bomb;
+            
             Bomb(piece2, piece1);
           }
         }
@@ -774,23 +761,45 @@ namespace BoardMain
     public void RainbowSuper(GamePiece rainbowPiece, GamePiece anotherPiece)
     {
       _objectDestroying = true;
+      
+      rainbowPiece.GetComponent<RainbowPiece>().SetPieces(rainbowPiece, anotherPiece);
+      
+      rainbowPiece.ClearableComponent.Clear();
+    }
 
+    public void ClearRainbow(GamePiece rainbowPiece, GamePiece anotherPiece)
+    {
       for (int x = 0; x < _width; x++)
       {
         for (int y = 0; y < _height; y++)
         {
+          if (x == rainbowPiece.X && y == rainbowPiece.Y)
+            ClearPiece(x, y);
+          
           if (anotherPiece.PieceType == PieceType.Rainbow)
           {
             ClearPiece(x, y);
           }
           else if (anotherPiece.PieceType == PieceType.Bomb)
           {
-            RainbowCommons(rainbowPiece, anotherPiece, x, y, PieceType.Bomb);
+            if (x == anotherPiece.X && y == anotherPiece.Y)
+              anotherPiece.ClearableComponent.Clear();
+            
+            if (Random.Range(0, 101) >= _chanceOfCreatingSpecialObjectByRainbow || pieces[x, y].PieceType != PieceType.Normal) continue;
+
+            GamePiece gamePiece = DestroyAndCreateNewPiece(pieces[x, y], x, y, PieceType.Bomb, ColorType.Any);
+            gamePiece.ClearableComponent.Clear();
           }
           else if (anotherPiece.PieceType == PieceType.RowClear || anotherPiece.PieceType == PieceType.ColumnClear)
           {
+            if (x == anotherPiece.X && y == anotherPiece.Y)
+              anotherPiece.ClearableComponent.Clear();
+
+            if (Random.Range(0, 101) >= _chanceOfCreatingSpecialObjectByRainbow || pieces[x, y].PieceType != PieceType.Normal) continue;
+            
             PieceType newPieceType = Random.Range(0, 2) == 0 ? PieceType.RowClear : PieceType.ColumnClear;
-            RainbowCommons(rainbowPiece, anotherPiece, x, y, newPieceType);
+            GamePiece gamePiece = DestroyAndCreateNewPiece(pieces[x, y], x, y, newPieceType, ColorType.Any);
+            gamePiece.ClearableComponent.Clear();
           }
           else if (pieces[x, y].IsColored() && pieces[x, y].ColorComponent.Color == anotherPiece.ColorComponent.Color)
           {
@@ -798,32 +807,6 @@ namespace BoardMain
           }
         }
       }
-
-      // FinishDestroyingObjectCallers();
-      // StartCoroutine(Fill(0.75f));
-    }
-
-    private void RainbowCommons(GamePiece rainbowPiece, GamePiece anotherPiece, int x, int y, PieceType newPieceType)
-    {
-      // if (pieces[x, y].PieceType != PieceType.Normal) return;
-      //
-      // if (rainbowPiece.X == x && rainbowPiece.Y == y)
-      // {
-      //   rainbowPiece.ClearableComponent.Clear();
-      //   return;
-      // }
-      // if (anotherPiece.X == x && anotherPiece.Y == y)
-      // {
-      //   anotherPiece.Activate();
-      //   return;
-      // }
-      //
-      // if (Random.Range(0, 101) >= _chanceOfCreatingSpecialObjectByRainbow) return;
-      //
-      // Destroy(pieces[x, y].gameObject);
-      // GamePiece newPiece = SpawnNewPiece(x, y, newPieceType);
-      // pieces[x, y] = newPiece;
-      // pieces[x, y].SetSpecialPieceTypeAndActivate(newPieceType, ColorType.Any);
     }
 
     public void RocketSuper(GamePiece rocketPiece, GamePiece anotherPiece)
@@ -924,22 +907,18 @@ namespace BoardMain
       _objectDestroying = false;
     }
 
-    public void Fillers()
+    private const float _standardFillTime = 0.1f;
+    public void Fillers(float newFillTime = _standardFillTime)
     {
+      ChangeFillTime(newFillTime);
+      
       ClearAllValidMatches();
 
       StartCoroutine(Fill());
     }
 
-    private IEnumerator ChangeFillTime(float fillTime, float newFillTime = 0.1f)
+    private void ChangeFillTime(float newFillTime = _standardFillTime)
     {
-      _fillTime = fillTime;
-      
-      yield return new WaitForSeconds(0.25f);
-      
-      while (IsFilling)
-        yield return 0;
-      
       _fillTime = newFillTime;
     }
 

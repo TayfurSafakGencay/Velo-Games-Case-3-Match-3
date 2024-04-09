@@ -82,20 +82,7 @@ namespace Piece
       ColorComponent.SetSprite(value, colorType);
       PieceType = pieceType;
     }
-    //
-    // private const float _activateTime = 1f;
-    // public void SetSpecialPieceTypeAndActivate(PieceType pieceType, ColorType colorType)
-    // {
-    //   SetPieceTypeInitial(pieceType, colorType);
-    //
-    //   Activate();
-    // }
-    //
-    // public void Activate()
-    // {
-    //   StartCoroutine(ClearableComponent.BeforeDestroyEffect(_activateTime));
-    // }
-
+    
     private void OnMouseEnter()
     {
       BoardRef.EnterPiece(this);

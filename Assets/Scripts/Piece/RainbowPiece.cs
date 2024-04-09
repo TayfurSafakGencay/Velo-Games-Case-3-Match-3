@@ -1,33 +1,40 @@
-using Enum;
+using System.Collections;
+using DG.Tweening;
+using UnityEngine;
 
 namespace Piece
 {
   public class RainbowPiece : ClearablePiece
   {
-    private ColorType _color { get; set; }
-
-    private PieceType _pieceType { get; set; }
-
     private GamePiece _rainbowPiece;
 
     private GamePiece _anotherPiece;
 
-    public void SetRainbowItems(GamePiece piece1, GamePiece piece2)
+    public void SetPieces(GamePiece rainbowPiece, GamePiece anotherPiece)
     {
-      _rainbowPiece = piece1;
-      _anotherPiece = piece2;
-
-      _color = _anotherPiece.ColorComponent.Color;
-      _pieceType = _anotherPiece.PieceType;
+      _rainbowPiece = rainbowPiece;
+      _anotherPiece = anotherPiece;
     }
-
     public override bool Clear()
     {
-      base.Clear();
-
-      _piece.BoardRef.RainbowSuper( _rainbowPiece, _anotherPiece);
+      StartCoroutine(BeforeDestroyEffect(0.5f));
 
       return true;
+    }
+    
+    public override IEnumerator BeforeDestroyEffect(float time)
+    {      
+      ExplosionAnimation();
+
+      yield return new WaitForSeconds(time);
+      
+      _explosionEffect.Kill();
+      
+      _piece.BoardRef.ClearRainbow(_rainbowPiece, _anotherPiece);
+      
+      _piece.BoardRef.Fillers();
+      
+      DestroyAnimation();
     }
   }
 }

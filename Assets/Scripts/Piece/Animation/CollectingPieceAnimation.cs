@@ -4,6 +4,8 @@ using DG.Tweening;
 using Enum;
 using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.Serialization;
+using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
 namespace Piece.Animation
@@ -13,12 +15,14 @@ namespace Piece.Animation
         [SerializeField]
         private RectTransform _target;
 
+        [SerializeField]
+        private GameObject _animatedObject;
+
         [Space(20)]
-        
         [SerializeField]
         private int _maxObjects;
 
-        private Dictionary<ColorType, Queue<GameObject>> _objectQueues = new();
+        private readonly Dictionary<ColorType, Queue<GameObject>> _objectQueues = new();
 
         [Space]
         [Header("Animation Settings")]
@@ -38,7 +42,7 @@ namespace Piece.Animation
         public struct AnimatedObject
         {
             public ColorType ColorType;
-            public GameObject AnimatedGameObject;
+            public Sprite AnimatedGameObjectSprite;
         }
 
         private void Awake()
@@ -57,13 +61,13 @@ namespace Piece.Animation
                 for (int j = 0; j < _animatedObjects.Count; j++)
                 {
                     AnimatedObject animObject = _animatedObjects[j];
-                    newObject = Instantiate(animObject.AnimatedGameObject, transform.position, quaternion.identity, transform);
+                    
+                    newObject = Instantiate(_animatedObject, transform.position, quaternion.identity, transform);
+                    newObject.GetComponent<Image>().sprite = animObject.AnimatedGameObjectSprite;
                     newObject.SetActive(false);
 
                     if (!_objectQueues.ContainsKey(animObject.ColorType))
-                    {
                         _objectQueues.Add(animObject.ColorType, new Queue<GameObject>());
-                    }
                     
                     _objectQueues[animObject.ColorType].Enqueue(newObject);
                 }

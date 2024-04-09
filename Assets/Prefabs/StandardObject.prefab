@@ -117,17 +117,17 @@ MonoBehaviour:
   Score: 250
   _specialObjectsSprites:
   - PieceType: 3
-    Sprite: {fileID: 21300000, guid: ab41658d866831a4db13a177f1659d53, type: 3}
+    Sprite: {fileID: 21300000, guid: 1edd1f35468e31045806b9cd56897f7b, type: 3}
   - PieceType: 4
-    Sprite: {fileID: 21300000, guid: 9f891ed2bd23890428deb18cf4fb8f73, type: 3}
+    Sprite: {fileID: 21300000, guid: 192251f44965106408b100bc07886fa6, type: 3}
   - PieceType: 6
-    Sprite: {fileID: 21300000, guid: 83ba289765390a246a27777e5328c752, type: 3}
+    Sprite: {fileID: 21300000, guid: 4d9b179b0df2868439abc0cb2986dba5, type: 3}
   - PieceType: 7
-    Sprite: {fileID: 21300000, guid: cebab9a273177194abf57c253f5f3357, type: 3}
+    Sprite: {fileID: 21300000, guid: 23d961ca958af374a90165f0fbe7fd63, type: 3}
   - PieceType: 8
-    Sprite: {fileID: 21300000, guid: cebab9a273177194abf57c253f5f3357, type: 3}
+    Sprite: {fileID: 21300000, guid: 23d961ca958af374a90165f0fbe7fd63, type: 3}
   - PieceType: 5
-    Sprite: {fileID: 21300000, guid: d96c85e61f5ca794cb50593cdfaf3b68, type: 3}
+    Sprite: {fileID: 21300000, guid: c96b1d67a897beb43beb5d6cb6e5573b, type: 3}
 --- !u!114 &-1300855292237277486
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -154,17 +154,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _colorSprites:
   - Color: 0
-    Sprite: {fileID: 21300000, guid: 88af6082a4f6bce4b862a30a07745334, type: 3}
+    Sprite: {fileID: 21300000, guid: 8be235d4213e14a48b8249172c50db0d, type: 3}
   - Color: 1
-    Sprite: {fileID: 21300000, guid: f50dead24d167cd4ebd48714ee86ec2c, type: 3}
+    Sprite: {fileID: 21300000, guid: 8cac5b1f41a3c164192a31971aa19259, type: 3}
   - Color: 2
-    Sprite: {fileID: 21300000, guid: b5bf5ffb759daf54ab28ecbd2244f3f3, type: 3}
+    Sprite: {fileID: 21300000, guid: 29d39a903df851a41928e4dbd70983a6, type: 3}
   - Color: 3
-    Sprite: {fileID: 21300000, guid: 6ca6db1d8b8558547bb86ea87061ac59, type: 3}
+    Sprite: {fileID: 21300000, guid: 60cb9e544589b8243af27e5a4cddfc44, type: 3}
   - Color: 4
-    Sprite: {fileID: 21300000, guid: 632d0f498e8d6a64983643462104396d, type: 3}
+    Sprite: {fileID: 21300000, guid: 9970a25005dc75644a39420d99b8a15c, type: 3}
   - Color: 5
-    Sprite: {fileID: 21300000, guid: b818e604437b42c48a24f3bd78c66d72, type: 3}
+    Sprite: {fileID: 21300000, guid: 3e4e61ac548044e43ae7ac8e8e4004d1, type: 3}
   _color: 0
 --- !u!114 &4487855510572299118
 MonoBehaviour:
