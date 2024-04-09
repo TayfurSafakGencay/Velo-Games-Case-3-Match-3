@@ -933,25 +933,12 @@ MonoBehaviour:
   - Type: 4
     Prefab: {fileID: 8771840423264288335, guid: 386c07e0233df9341a86d0eacfbacae4, type: 3}
   - Type: 5
-    Prefab: {fileID: 8771840423264288335, guid: a6896379c91e05f4fbadcd7552976c27, type: 3}
+    Prefab: {fileID: 8771840423264288335, guid: bf5328e0762ba4b448cd468495688153, type: 3}
   - Type: 6
+    Prefab: {fileID: 8771840423264288335, guid: a6896379c91e05f4fbadcd7552976c27, type: 3}
+  - Type: 7
     Prefab: {fileID: 8771840423264288335, guid: c9bf63d208339b5438ba229973a33cdb, type: 3}
-  initialPieces:
-  - type: 2
-    x: 3
-    y: 3
-  - type: 2
-    x: 4
-    y: 4
-  - type: 2
-    x: 5
-    y: 6
-  - type: 2
-    x: 2
-    y: 1
-  - type: 2
-    x: 7
-    y: 3
+  _initialPieces: []
 --- !u!1 &1614536844
 GameObject:
   m_ObjectHideFlags: 0
@@ -1092,8 +1079,8 @@ MonoBehaviour:
   Board: {fileID: 787276510}
   Hud: {fileID: 64753852}
   ScoreFirstStar: 65000
-  ScoreSecondStar: 75000
-  ScoreThirdStar: 90000
+  ScoreSecondStar: 67500
+  ScoreThirdStar: 70000
   _timeInSeconds: 7500
   _targetScore: 65000
 --- !u!1660057539 &9223372036854775807
