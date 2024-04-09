@@ -111,6 +111,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Score: 500
+  _specialObjectsSprites:
+  - PieceType: 3
+    Sprite: {fileID: 21300000, guid: ab41658d866831a4db13a177f1659d53, type: 3}
+  - PieceType: 4
+    Sprite: {fileID: 21300000, guid: 9f891ed2bd23890428deb18cf4fb8f73, type: 3}
+  - PieceType: 6
+    Sprite: {fileID: 21300000, guid: 83ba289765390a246a27777e5328c752, type: 3}
+  - PieceType: 7
+    Sprite: {fileID: 21300000, guid: cebab9a273177194abf57c253f5f3357, type: 3}
+  - PieceType: 5
+    Sprite: {fileID: 21300000, guid: d96c85e61f5ca794cb50593cdfaf3b68, type: 3}
 --- !u!114 &-1300855292237277486
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -136,23 +147,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _colorSprites:
-  - Color: 0
-    Sprite: {fileID: 21300000, guid: 88af6082a4f6bce4b862a30a07745334, type: 3}
-  - Color: 1
-    Sprite: {fileID: 21300000, guid: f50dead24d167cd4ebd48714ee86ec2c, type: 3}
-  - Color: 2
-    Sprite: {fileID: 21300000, guid: b5bf5ffb759daf54ab28ecbd2244f3f3, type: 3}
-  - Color: 3
-    Sprite: {fileID: 21300000, guid: 6ca6db1d8b8558547bb86ea87061ac59, type: 3}
-  - Color: 4
-    Sprite: {fileID: 21300000, guid: 632d0f498e8d6a64983643462104396d, type: 3}
-  - Color: 5
-    Sprite: {fileID: 21300000, guid: b818e604437b42c48a24f3bd78c66d72, type: 3}
-  - Color: 8
-    Sprite: {fileID: 21300000, guid: 5d35855a77712c9408cab908d01dbe09, type: 3}
-  - Color: 9
+  - Color: 6
     Sprite: {fileID: 21300000, guid: 068640a237c54b14d87cb8a89828ecd1, type: 3}
-  _color: 0
+  _color: 6
 --- !u!114 &8335861806563444821
 MonoBehaviour:
   m_ObjectHideFlags: 0
