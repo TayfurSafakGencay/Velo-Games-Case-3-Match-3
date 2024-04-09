@@ -1,45 +1,18 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
+using Enum;
 using Levels.Main;
 using Piece;
 using Piece.Animation;
 using Unity.Mathematics;
 using UnityEngine;
+using Vo;
 using Random = UnityEngine.Random;
 
 namespace BoardMain
 {
   public class Board : MonoBehaviour
   {
-    [Serializable]
-    public enum PieceType
-    {
-      Empty,
-      Normal,
-      Obstacle,
-      RowClear,
-      ColumnClear,
-      Rainbow,
-      Bomb,
-      Count
-    }
-
-    [Serializable]
-    public struct PiecePrefab
-    {
-      public PieceType Type;
-      public GameObject Prefab;
-    }
-  
-    [Serializable]
-    public struct PiecePosition
-    {
-      public PieceType type;
-      public int x;
-      public int y;
-    }
-
     public Level Level;
 
     [SerializeField]
@@ -57,13 +30,16 @@ namespace BoardMain
     [SerializeField]
     private CollectingPieceAnimation _collectingPieceAnimation;
 
+    [Header("Piece Prefabs")]
     [SerializeField]
     private List<PiecePrefab> _piecePrefabs;
-
-    public List<PiecePosition> initialPieces;
-
+    
     private readonly Dictionary<PieceType, GameObject> _piecePrefabsDictionary = new();
 
+    [Header("Initial Pieces")]
+    [SerializeField]
+    private List<PiecePosition> _initialPieces;
+    
     private GamePiece[,] pieces;
 
     private bool inverse;
@@ -74,9 +50,7 @@ namespace BoardMain
 
     private bool _gameOver;
 
-    private bool _isFilling;
-
-    public bool IsFilling => _isFilling;
+    public bool IsFilling { get; private set; }
 
     private bool _isSwapping;
 
@@ -85,7 +59,6 @@ namespace BoardMain
     private void Awake()
     {
       AddPrefabsToDictionary();
-
       Setup();
       SetPieces();
     }
@@ -117,12 +90,12 @@ namespace BoardMain
     {
       pieces = new GamePiece[_width, _height];
 
-      for (int i = 0; i < initialPieces.Count; i++)
+      for (int i = 0; i < _initialPieces.Count; i++)
       {
-        if (initialPieces[i].x >= 0 && initialPieces[i].x < _width
-                                    && initialPieces[i].y >= 0 && initialPieces[i].y < _height)
+        if (_initialPieces[i].x >= 0 && _initialPieces[i].x < _width
+                                    && _initialPieces[i].y >= 0 && _initialPieces[i].y < _height)
         {
-          SpawnNewPiece(initialPieces[i].x, initialPieces[i].y, initialPieces[i].type);
+          SpawnNewPiece(_initialPieces[i].x, _initialPieces[i].y, _initialPieces[i].type);
         }
       }
     
@@ -156,10 +129,12 @@ namespace BoardMain
       return pieces[x, y];
     }
 
-    public IEnumerator Fill()
+    public IEnumerator Fill(float time = 0f)
     {
+      yield return new WaitForSeconds(time);
+      
       bool needsRefill = true;
-      _isFilling = true;
+      IsFilling = true;
 
       while (_objectDestroying)
       {
@@ -168,18 +143,20 @@ namespace BoardMain
       
       while (needsRefill)
       {
+
         yield return new WaitForSeconds(_fillTime);
 
         while (FillStep())
         {
           inverse = !inverse;
           yield return new WaitForSeconds(_fillTime);
+
         }
 
         needsRefill = ClearAllValidMatches();
       }
 
-      _isFilling = false;
+      IsFilling = false;
     }
 
     public bool FillStep()
@@ -202,7 +179,7 @@ namespace BoardMain
           if (!piece.IsMovable()) continue;
           GamePiece pieceBelow = pieces[x, y + 1];
 
-          if (pieceBelow.Type == PieceType.Empty)
+          if (pieceBelow.PieceType == PieceType.Empty)
           {
             Destroy(pieceBelow.gameObject);
             piece.MovableComponent.Move(x, y + 1, _fillTime);
@@ -226,7 +203,7 @@ namespace BoardMain
               if (diagX < 0 || diagX >= _width) continue;
               GamePiece diagonalPiece = pieces[diagX, y + 1];
 
-              if (diagonalPiece.Type != PieceType.Empty) continue;
+              if (diagonalPiece.PieceType != PieceType.Empty) continue;
               bool hasPieceAbove = true;
 
               for (int aboveY = y; aboveY >= 0; aboveY--)
@@ -237,7 +214,7 @@ namespace BoardMain
                 {
                   break;
                 }
-                else if (!pieceAbove.IsMovable() && pieceAbove.Type != PieceType.Empty)
+                else if (!pieceAbove.IsMovable() && pieceAbove.PieceType != PieceType.Empty)
                 {
                   hasPieceAbove = false;
                   break;
@@ -260,7 +237,7 @@ namespace BoardMain
       {
         GamePiece pieceBelow = pieces[x, 0];
 
-        if (pieceBelow.Type != PieceType.Empty) continue;
+        if (pieceBelow.PieceType != PieceType.Empty) continue;
 
         Destroy(pieceBelow.gameObject);
         GameObject newPiece = Instantiate(_piecePrefabsDictionary[PieceType.Normal], GetWorldPosition(x, -1), Quaternion.identity, transform);
@@ -268,7 +245,7 @@ namespace BoardMain
         pieces[x, 0] = newPiece.GetComponent<GamePiece>();
         pieces[x, 0].Init(x, -1, this, PieceType.Normal);
         pieces[x, 0].MovableComponent.Move(x, 0, _fillTime);
-        pieces[x, 0].ColorComponent.SetColor((ColorPiece.ColorType)Random.Range(0, pieces[x, 0].ColorComponent.ColorNumber));
+        pieces[x, 0].ColorComponent.SetColor((ColorType)Random.Range(0, pieces[x, 0].ColorComponent.ColorNumber));
         movedPiece = true;
       }
 
@@ -284,7 +261,7 @@ namespace BoardMain
     private const float _swapPieceTime = 0.15f;
     public void SwapPieces(GamePiece piece1, GamePiece piece2)
     {
-      if (_gameOver || _isFilling || _isSwapping) return;
+      if (_gameOver || IsFilling || _isSwapping) return;
     
       if (!piece1.IsMovable() || !piece2.IsMovable()) return;
 
@@ -292,7 +269,10 @@ namespace BoardMain
       pieces[piece2.X, piece2.Y] = piece1;
 
       if (GetMatch(piece1, piece2.X, piece2.Y) != null || GetMatch(piece2, piece1.X, piece1.Y) != null
-                                                       || piece1.Type == PieceType.Rainbow || piece2.Type == PieceType.Rainbow)
+                                                       || piece1.PieceType == PieceType.Rainbow || piece2.PieceType == PieceType.Rainbow
+                                                       || piece1.PieceType == PieceType.ColumnClear || piece2.PieceType == PieceType.ColumnClear
+                                                       || piece1.PieceType == PieceType.RowClear || piece2.PieceType == PieceType.RowClear
+                                                       || piece1.PieceType == PieceType.Bomb || piece2.PieceType == PieceType.Bomb)
       {
         _isSwapping = true;
         
@@ -302,39 +282,67 @@ namespace BoardMain
         piece1.MovableComponent.Move(piece2.X, piece2.Y, _swapPieceTime);
         piece2.MovableComponent.Move(piece1X, piece1Y, _swapPieceTime);
 
-        if (piece1.Type == PieceType.Rainbow && piece1.IsClearable() && piece2.IsColored())
+        MatchKey matchKey = MatchKey.Empty;
+
+        if (piece1.PieceType == PieceType.Rainbow && piece1.IsClearable() && piece2.IsColored())
         {
+          matchKey = MatchKey.Rainbow;
+          
           RainbowPiece rainbowPiece = piece1.GetComponent<RainbowPiece>();
 
           if (rainbowPiece)
           {
-            rainbowPiece.Color = piece2.ColorComponent.Color;
+            rainbowPiece.SetRainbowItems(piece1, piece2); 
           }
 
-          ClearPiece(piece1.X, piece1.Y);
+          RainbowSuper(piece1, piece2);
         }
-        else if (piece2.Type == PieceType.Rainbow && piece2.IsClearable() && piece1.IsColored())
+        else if (piece2.PieceType == PieceType.Rainbow && piece2.IsClearable() && piece1.IsColored())
         {
+          matchKey = MatchKey.Rainbow;
+          
           RainbowPiece rainbowPiece = piece2.GetComponent<RainbowPiece>();
 
           if (rainbowPiece)
           {
-            rainbowPiece.Color = piece1.ColorComponent.Color;
+            rainbowPiece.SetRainbowItems(piece2, piece1); 
           }
 
-          ClearPiece(piece2.X, piece2.Y);
+          RainbowSuper(piece2, piece1);
         }
 
+        if (matchKey == MatchKey.Empty)
+        {
+          if (piece1.PieceType == PieceType.RowClear || piece1.PieceType == PieceType.ColumnClear)
+          {
+            matchKey = MatchKey.Column;
+            
+            RocketSuper(piece1, piece2);
+          }
+          if (piece2.PieceType == PieceType.RowClear || piece2.PieceType == PieceType.ColumnClear)
+          {
+            matchKey = MatchKey.Row;
+
+            RocketSuper(piece2, piece1);
+          }
+        }
+
+        if (matchKey == MatchKey.Empty)
+        {
+          if (piece1.PieceType == PieceType.Bomb)
+          {
+            matchKey = MatchKey.Bomb;
+
+            Bomb(piece1, piece2);
+          }
+          else if (piece2.PieceType == PieceType.Bomb)
+          {
+            matchKey = MatchKey.Bomb;
+            Bomb(piece2, piece1);
+          }
+        }
+        
         ClearAllValidMatches();
-
-        if (piece1.Type == PieceType.RowClear || piece1.Type == PieceType.ColumnClear)
-        {
-          ClearPiece(piece1.X, piece1.Y);
-        }
-        if (piece2.Type == PieceType.RowClear || piece2.Type == PieceType.ColumnClear)
-        {
-          ClearPiece(piece2.X, piece2.Y);
-        }
 
         _enteredPiece = null;
         _pressedPiece = null;
@@ -403,7 +411,7 @@ namespace BoardMain
 
       horizontalPieces.Add(piece);
 
-      ColorPiece.ColorType color = piece.ColorComponent.Color;
+      ColorType color = piece.ColorComponent.Color;
 
       for (int dir = 0; dir <= 1; dir++)
       {
@@ -420,7 +428,10 @@ namespace BoardMain
 
           if (pieces[x, newY].IsColored() && pieces[x, newY].ColorComponent.Color == color)
           {
-            horizontalPieces.Add(pieces[x, newY]);
+            if (pieces[x, newY].PieceType == PieceType.Normal)
+            {
+              horizontalPieces.Add(pieces[x, newY]);
+            }
           }
           else
           {
@@ -458,7 +469,10 @@ namespace BoardMain
 
               if (pieces[horizontalPieces[i].X, y].IsColored() && pieces[horizontalPieces[i].X, y].ColorComponent.Color == color)
               {
-                verticalPieces.Add(pieces[horizontalPieces[i].X, y]);
+                if (pieces[horizontalPieces[i].X, y].PieceType == PieceType.Normal)
+                {
+                  verticalPieces.Add(pieces[horizontalPieces[i].X, y]);
+                }
               }
               else break;
             }
@@ -505,7 +519,10 @@ namespace BoardMain
 
           if (pieces[newX, y].IsColored() && pieces[newX, y].ColorComponent.Color == color)
           {
-            verticalPieces.Add(pieces[newX, y]);
+            if (pieces[newX, y].PieceType == PieceType.Normal)
+            {
+              verticalPieces.Add(pieces[newX, y]);
+            }
           }
           else
           {
@@ -543,7 +560,10 @@ namespace BoardMain
 
               if (pieces[x, verticalPieces[i].Y].IsColored() && pieces[x, verticalPieces[i].Y].ColorComponent.Color == color)
               {
-                horizontalPieces.Add(pieces[x, verticalPieces[i].Y]);
+                if (pieces[x, verticalPieces[i].Y].PieceType == PieceType.Normal)
+                {
+                  horizontalPieces.Add(pieces[x, verticalPieces[i].Y]);
+                }
               }
               else break;
             }
@@ -629,15 +649,15 @@ namespace BoardMain
 
           if (specialPieceType == PieceType.RowClear && newPiece.IsColored() && match[0].IsColored())
           {
-            newPiece.ColorComponent.SetColor(ColorPiece.ColorType.Row);
+            newPiece.SetPieceTypeInitial(PieceType.RowClear, ColorType.Any);
           }
           else if (specialPieceType == PieceType.ColumnClear && newPiece.IsColored() && match[0].IsColored())
           {
-            newPiece.ColorComponent.SetColor(ColorPiece.ColorType.Column);
+            newPiece.SetPieceTypeInitial(PieceType.ColumnClear, ColorType.Any);
           }
           else if (specialPieceType == PieceType.Rainbow && newPiece.IsColored())
           {
-            newPiece.ColorComponent.SetColor(ColorPiece.ColorType.Any);
+            newPiece.SetPieceTypeInitial(PieceType.Rainbow, ColorType.Any);
           }
         }
       }
@@ -677,18 +697,16 @@ namespace BoardMain
 
       if (!piece.IsClearable() || piece.ClearableComponent.IsBeingCleared) return false;
       
-      _objectDestroying = true;
       piece.ClearableComponent.Clear();
 
-      if (piece.Type == PieceType.Normal)
+      if (piece.PieceType == PieceType.Normal)
       {
         StartCoroutine(StartDestroyAnimation(piece));  
       }
-      
+
       SpawnNewPiece(x, y, PieceType.Empty);
       ClearObstacles(x, y);
 
-      FinishDestroyingObjectCallers();
 
       return true;
     }
@@ -708,7 +726,7 @@ namespace BoardMain
         if (adjacentX != x && adjacentX >= 0 && adjacentX < _width)
         {
           GamePiece piece = pieces[adjacentX, y];
-          if (piece.Type != PieceType.Obstacle || !piece.IsClearable()) continue;
+          if (piece.PieceType != PieceType.Obstacle || !piece.IsClearable()) continue;
         
           bool isCleared = piece.ClearableComponent.Clear();
           
@@ -724,7 +742,7 @@ namespace BoardMain
         if (adjacentY != y && adjacentY >= 0 && adjacentY < _height)
         {
           GamePiece piece = pieces[x, adjacentY];
-          if (piece.Type != PieceType.Obstacle || !piece.IsClearable()) continue;
+          if (piece.PieceType != PieceType.Obstacle || !piece.IsClearable()) continue;
 
           bool isCleared = piece.ClearableComponent.Clear();
 
@@ -738,31 +756,22 @@ namespace BoardMain
 
     public void RowRocket(int row)
     {
-      _objectDestroying = true;
-
       for (int x = 0; x < _width; x++)
       {
         ClearPiece(x, row);
-        
-        if(x != _width -1) continue;
-        FinishDestroyingObjectCallers();
       }
     }
 
     public void ColumnRocket(int column)
     {
-      _objectDestroying = true;
-
       for (int y = 0; y < _height; y++)
       {
         ClearPiece(column, y);
-        
-        if(y != _height -1) continue;
-        FinishDestroyingObjectCallers();
       }
     }
 
-    public void RainBow(ColorPiece.ColorType color)
+    private const int _chanceOfCreatingSpecialObjectByRainbow = 20;
+    public void RainbowSuper(GamePiece rainbowPiece, GamePiece anotherPiece)
     {
       _objectDestroying = true;
 
@@ -770,72 +779,155 @@ namespace BoardMain
       {
         for (int y = 0; y < _height; y++)
         {
-          if (pieces[x, y].IsColored() && pieces[x, y].ColorComponent.Color == color || color == ColorPiece.ColorType.Any)
+          if (anotherPiece.PieceType == PieceType.Rainbow)
           {
             ClearPiece(x, y);
           }
-
-          if (x == _width - 1 && y == _height -1)
+          else if (anotherPiece.PieceType == PieceType.Bomb)
           {
-            FinishDestroyingObjectCallers();
+            RainbowCommons(rainbowPiece, anotherPiece, x, y, PieceType.Bomb);
           }
+          else if (anotherPiece.PieceType == PieceType.RowClear || anotherPiece.PieceType == PieceType.ColumnClear)
+          {
+            PieceType newPieceType = Random.Range(0, 2) == 0 ? PieceType.RowClear : PieceType.ColumnClear;
+            RainbowCommons(rainbowPiece, anotherPiece, x, y, newPieceType);
+          }
+          else if (pieces[x, y].IsColored() && pieces[x, y].ColorComponent.Color == anotherPiece.ColorComponent.Color)
+          {
+            ClearPiece(x, y);
+          }
+        }
+      }
+
+      // FinishDestroyingObjectCallers();
+      // StartCoroutine(Fill(0.75f));
+    }
+
+    private void RainbowCommons(GamePiece rainbowPiece, GamePiece anotherPiece, int x, int y, PieceType newPieceType)
+    {
+      // if (pieces[x, y].PieceType != PieceType.Normal) return;
+      //
+      // if (rainbowPiece.X == x && rainbowPiece.Y == y)
+      // {
+      //   rainbowPiece.ClearableComponent.Clear();
+      //   return;
+      // }
+      // if (anotherPiece.X == x && anotherPiece.Y == y)
+      // {
+      //   anotherPiece.Activate();
+      //   return;
+      // }
+      //
+      // if (Random.Range(0, 101) >= _chanceOfCreatingSpecialObjectByRainbow) return;
+      //
+      // Destroy(pieces[x, y].gameObject);
+      // GamePiece newPiece = SpawnNewPiece(x, y, newPieceType);
+      // pieces[x, y] = newPiece;
+      // pieces[x, y].SetSpecialPieceTypeAndActivate(newPieceType, ColorType.Any);
+    }
+
+    public void RocketSuper(GamePiece rocketPiece, GamePiece anotherPiece)
+    {
+      _objectDestroying = true;
+      
+      if (anotherPiece.PieceType == PieceType.ColumnClear || anotherPiece.PieceType == PieceType.RowClear)
+      {
+        switch (rocketPiece.PieceType)
+        {
+          case PieceType.ColumnClear:
+            anotherPiece.SetPieceTypeInitial(PieceType.RowClear, ColorType.Any);
+            break;
+          case PieceType.RowClear:
+            anotherPiece.SetPieceTypeInitial(PieceType.ColumnClear, ColorType.Any);
+            break;
+        }
+
+        rocketPiece.ClearableComponent.Clear();
+        anotherPiece.ClearableComponent.Clear();
+      }
+      else if (anotherPiece.PieceType == PieceType.Bomb)
+      {
+        GamePiece superRocketPiece = DestroyAndCreateNewPiece(_pressedPiece, _pressedPiece.X, _pressedPiece.Y, PieceType.SuperRocket, ColorType.Any);
+        superRocketPiece.ClearableComponent.Clear();
+
+        for (int x = _pressedPiece.X - 1; x <= _pressedPiece.X + 1; x++)
+        {
+          if (x == _pressedPiece.X || x < 0 || x >= _width) continue;
+
+          GamePiece piece = DestroyAndCreateNewPiece(pieces[x, _pressedPiece.Y], x, _pressedPiece.Y, PieceType.ColumnClear, ColorType.Any);
+          piece.ClearableComponent.Clear();
+        }
+
+        for (int y = _pressedPiece.Y - 1; y <= _pressedPiece.Y + 1; y++)
+        {
+          if (y == _pressedPiece.Y || y < 0 || y >= _height) continue;
+
+          GamePiece piece = DestroyAndCreateNewPiece(pieces[_pressedPiece.X, y], _pressedPiece.X, y, PieceType.RowClear, ColorType.Any);
+          piece.ClearableComponent.Clear();
+        }
+      }
+      else if (anotherPiece.IsClearable() && anotherPiece.PieceType == PieceType.Normal)
+      {
+        rocketPiece.ClearableComponent.Clear();
+      }
+    }
+
+    public void Bomb(GamePiece bombPiece, GamePiece anotherPiece)
+    {
+      if (anotherPiece.PieceType == PieceType.Normal)
+      {
+        bombPiece.ClearableComponent.Clear();
+      }
+      else if (anotherPiece.PieceType == PieceType.Bomb)
+      {
+        
+      }
+    }
+
+    public void ClearBomb(GamePiece bombPiece)
+    {
+      for (int adjacentX = bombPiece.X - 1; adjacentX <= bombPiece.X + 1; adjacentX++)
+      {
+        if (adjacentX < 0 || adjacentX >= _width) continue;
+
+        for (int adjacentY = bombPiece.Y - 1; adjacentY <= bombPiece.Y + 1; adjacentY++)
+        {
+          if (adjacentY < 0 || adjacentY >= _height) continue;
+          ClearPiece(adjacentX, adjacentY);
         }
       }
     }
 
-    public void Bomb(int x, int y)
+    private GamePiece DestroyAndCreateNewPiece(GamePiece gamePiece, int x, int y, PieceType pieceType, ColorType colorType)
     {
-      print(x + "   " + y);
+      Destroy(gamePiece.gameObject);
+      GamePiece newPiece = SpawnNewPiece(x, y, pieceType);
+      pieces[x, y] = newPiece;
+      pieces[x, y].SetPieceTypeInitial(pieceType, colorType);
 
-      for (int adjacentX = x - 1; adjacentX <= x + 1; adjacentX++)
-      {
-        if (adjacentX == x || adjacentX < 0 || adjacentX >= _width) continue;
-
-        for (int adjacentY = y - 1; adjacentY <= y + 1; adjacentY++)
-        {
-          if (adjacentY == y || adjacentY < 0 || adjacentY >= _height) continue;
-          
-          print(x + "     " + y);
-          
-          // GamePiece piece = pieces[adjacentX, adjacentY];
-          //
-          // if (piece.Type == PieceType.Normal)
-          // {
-          //   
-          // }
-          // else if (piece.Type == PieceType.Obstacle)
-          // {
-          //   bool isCleared = piece.ClearableComponent.Clear();
-          //
-          //   if (isCleared)
-          //     SpawnNewPiece(adjacentX, y, PieceType.Empty);
-          // }
-          // else if (piece.Type == PieceType.Rainbow)
-          // {
-          //   
-          // }
-          // else if (piece.Type == PieceType.Bomb)
-          // {
-          //   
-          // }
-        }
-      }
+      return pieces[x, y];
     }
 
     private const float _destroyingObjectTime = 0.5f;
 
-    private void FinishDestroyingObjectCallers()
+    public void FinishDestroyingObjectCallers(float time = _destroyingObjectTime)
     {
-      StopCoroutine(FinishDestroyingObject());
-
-      StartCoroutine(FinishDestroyingObject());
+      StopCoroutine(FinishDestroyingObject(time));
+      StartCoroutine(FinishDestroyingObject(time));
     }
 
-    private IEnumerator FinishDestroyingObject()
+    private IEnumerator FinishDestroyingObject(float time)
     {
-      yield return new WaitForSeconds(_destroyingObjectTime);
+      yield return new WaitForSeconds(time);
 
       _objectDestroying = false;
+    }
+
+    public void Fillers()
+    {
+      ClearAllValidMatches();
+
+      StartCoroutine(Fill());
     }
 
     private IEnumerator ChangeFillTime(float fillTime, float newFillTime = 0.1f)
@@ -863,7 +955,7 @@ namespace BoardMain
       {
         for (int y = 0; y < _height; y++)
         {
-          if (pieces[x, y].Type == type)
+          if (pieces[x, y].PieceType == type)
           {
             gamePieces.Add(pieces[x, y]);
           }
@@ -877,11 +969,11 @@ namespace BoardMain
     {
       List<PiecePosition> gamePieces = new();
 
-      for (int i = 0; i < initialPieces.Count; i++)
+      for (int i = 0; i < _initialPieces.Count; i++)
       {
-        if (initialPieces[i].type == type)
+        if (_initialPieces[i].type == type)
         {
-          gamePieces.Add(initialPieces[i]);
+          gamePieces.Add(_initialPieces[i]);
         }
       }
 

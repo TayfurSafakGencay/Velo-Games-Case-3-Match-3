@@ -1,5 +1,5 @@
 ﻿using System.Collections;
-using BoardMain;
+using Enum;
 using Piece;
 using UnityEngine;
 
@@ -14,7 +14,7 @@ namespace Levels
 
         private int _movesUsed;
 
-        public Board.PieceType[] ObstacleTypes;
+        public PieceType[] ObstacleTypes;
 
         private int _numberObstacleLeft;
 
@@ -53,7 +53,7 @@ namespace Levels
 
             for (int i = 0; i < ObstacleTypes.Length; i++)
             {
-                if (ObstacleTypes[i] != piece.Type) continue;
+                if (ObstacleTypes[i] != piece.PieceType) continue;
             
                 _numberObstacleLeft--;
                 Hud.SetTargetScore(_numberObstacleLeft);

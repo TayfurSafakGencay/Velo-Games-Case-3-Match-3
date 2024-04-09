@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using DG.Tweening;
+using Enum;
 using Unity.Mathematics;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -17,7 +18,7 @@ namespace Piece.Animation
         [SerializeField]
         private int _maxObjects;
 
-        private Dictionary<ColorPiece.ColorType, Queue<GameObject>> _objectQueues = new();
+        private Dictionary<ColorType, Queue<GameObject>> _objectQueues = new();
 
         [Space]
         [Header("Animation Settings")]
@@ -36,7 +37,7 @@ namespace Piece.Animation
         [Serializable]
         public struct AnimatedObject
         {
-            public ColorPiece.ColorType ColorType;
+            public ColorType ColorType;
             public GameObject AnimatedGameObject;
         }
 
@@ -75,14 +76,13 @@ namespace Piece.Animation
 
         private void AnimateObject(Vector3 objectPosition, GamePiece piece)
         {
-            ColorPiece.ColorType color = piece.ColorComponent.Color;
+            ColorType color = piece.ColorComponent.Color;
             
             if(!_objectQueues.ContainsKey(color)) return;
             
             if (_objectQueues[color].Count <= 0) return;
             
             GameObject animatedObject = _objectQueues[color].Dequeue();
-            
                 
             animatedObject.SetActive(true);
             animatedObject.transform.position = objectPosition;

@@ -1,38 +1,18 @@
-using System;
 using System.Collections.Generic;
+using Enum;
 using UnityEngine;
+using Vo;
 
 namespace Piece
 {
   public class ColorPiece : MonoBehaviour
   {
-    public enum ColorType
-    {
-      Red,
-      Orange,
-      Yellow,
-      Green,
-      Blue,
-      Pink,
-      Any,
-      Count,
-      Row,
-      Column,
-    }
-  
-    [Serializable]
-    public struct ColorSprite
-    {
-      public ColorType Color;
-      public Sprite Sprite;
-    }
-
     [SerializeField]
     private List<ColorSprite> _colorSprites;
+    
+    private readonly Dictionary<ColorType, Sprite> _colorSpriteDictionary = new();
 
-    private SpriteRenderer _sprite;
-
-    private Dictionary<ColorType, Sprite> _colorSpriteDictionary = new();
+    private SpriteRenderer _spriteRenderer;
 
     [SerializeField]
     private ColorType _color;
@@ -47,7 +27,7 @@ namespace Piece
 
     private void Awake()
     {
-      _sprite = gameObject.GetComponent<SpriteRenderer>();
+      _spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
       
       for (int i = 0; i < _colorSprites.Count; i++)
       {
@@ -60,15 +40,16 @@ namespace Piece
 
     public void SetColor(ColorType newColor)
     {
-      if (!_colorSpriteDictionary.TryGetValue(newColor, out Sprite value))
-      {
-        
-        print(newColor);
-        return;
-      }
+      if (!_colorSpriteDictionary.TryGetValue(newColor, out Sprite value)) return;
     
-      _sprite.sprite = value;
+      _spriteRenderer.sprite = value;
       Color = newColor;
+    }
+
+    public void SetSprite(Sprite sprite, ColorType colorType)
+    {
+      _spriteRenderer.sprite = sprite;
+      Color = colorType;
     }
   }
 }

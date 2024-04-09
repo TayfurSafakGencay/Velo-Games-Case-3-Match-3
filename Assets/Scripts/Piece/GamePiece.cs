@@ -1,11 +1,20 @@
+using System.Collections;
+using System.Collections.Generic;
 using BoardMain;
+using Enum;
 using UnityEngine;
+using Vo;
 
 namespace Piece
 {
   public class GamePiece : MonoBehaviour
   {
     public int Score;
+    
+    [SerializeField]
+    private List<SpecialObject> _specialObjectsSprites;
+    
+    private readonly Dictionary<PieceType, Sprite> _specialObjectSpriteDictionary = new();
   
     private int _x;
     public int X
@@ -33,7 +42,7 @@ namespace Piece
       }
     }
 
-    public Board.PieceType Type { get; private set; }
+    public PieceType PieceType { get; private set; }
 
     public Board BoardRef { get; private set; }
 
@@ -48,15 +57,44 @@ namespace Piece
       MovableComponent = gameObject.GetComponent<MovablePiece>();
       ColorComponent = gameObject.GetComponent<ColorPiece>();
       ClearableComponent = gameObject.GetComponent<ClearablePiece>();
+      
+      for (int i = 0; i < _specialObjectsSprites.Count; i++)
+      {
+        if (!_specialObjectSpriteDictionary.ContainsKey(_specialObjectsSprites[i].PieceType))
+        {
+          _specialObjectSpriteDictionary.Add(_specialObjectsSprites[i].PieceType, _specialObjectsSprites[i].Sprite);
+        }
+      }
     }
 
-    public void Init(int x, int y, Board board, Board.PieceType type)
+    public void Init(int x, int y, Board board, PieceType type)
     {
       X = x;
       Y = y;
       BoardRef = board;
-      Type = type;
+      PieceType = type;
     }
+
+    public void SetPieceTypeInitial(PieceType pieceType, ColorType colorType)
+    {
+      if (!_specialObjectSpriteDictionary.TryGetValue(pieceType, out Sprite value)) return;
+
+      ColorComponent.SetSprite(value, colorType);
+      PieceType = pieceType;
+    }
+    //
+    // private const float _activateTime = 1f;
+    // public void SetSpecialPieceTypeAndActivate(PieceType pieceType, ColorType colorType)
+    // {
+    //   SetPieceTypeInitial(pieceType, colorType);
+    //
+    //   Activate();
+    // }
+    //
+    // public void Activate()
+    // {
+    //   StartCoroutine(ClearableComponent.BeforeDestroyEffect(_activateTime));
+    // }
 
     private void OnMouseEnter()
     {
@@ -71,7 +109,6 @@ namespace Piece
     private void OnMouseUp()
     {
       BoardRef.ReleasePiece();
-    
     }
 
     public bool IsMovable()
