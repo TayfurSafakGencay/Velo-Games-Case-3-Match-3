@@ -29,8 +29,11 @@ namespace Piece
       yield return new WaitForSeconds(time);
       
       _explosionEffect.Kill();
-      
-      _piece.BoardRef.ClearRainbow(_rainbowPiece, _anotherPiece);
+
+      if (_rainbowPiece != null && _anotherPiece != null)
+      {
+        _piece.BoardRef.ClearRainbow(_rainbowPiece, _anotherPiece);
+      }
       
       _piece.BoardRef.Fillers();
       

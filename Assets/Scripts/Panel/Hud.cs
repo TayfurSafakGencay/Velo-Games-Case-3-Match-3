@@ -51,21 +51,6 @@ namespace Panel
         public void SetScore(int score)
         {
             StartCoroutine(CountUpToTarget(score));
-            
-            if (_newScore >= Level.ScoreThirdStar)
-            {
-                _starIdx = 3;
-            }
-            else if (_newScore >= Level.ScoreSecondStar)
-            {
-                _starIdx = 2;
-            }
-            else if (_newScore >= Level.ScoreFirstStar)
-            {
-                _starIdx = 1;
-            }
-        
-            SetStars();
         }
 
         private const float _targetScale = 1.25f;
@@ -104,13 +89,27 @@ namespace Panel
             _isContinuousCount = false;
             
             _newScore = score;
+            SetStars();
         }
 
         private void SetStars()
         {
+            if (_newScore >= Level.ScoreThirdStar)
+            {
+                _starIdx = 3;
+            }
+            else if (_newScore >= Level.ScoreSecondStar)
+            {
+                _starIdx = 2;
+            }
+            else if (_newScore >= Level.ScoreFirstStar)
+            {
+                _starIdx = 1;
+            }
+            
             for (int i = 0; i < _stars.Count; i++)
             {
-                _stars[i].color = _starIdx > i ? Color.yellow : Color.gray;
+                _stars[i].color = _starIdx > i ? Color.white : Color.gray;
             }
         }
 

@@ -1,9 +1,12 @@
-﻿namespace Enum
+﻿using System;
+
+namespace Enum
 {
+  [Serializable]
   public enum ColorType
   {
     Red,
-    Orange,
+    Brown,
     Yellow,
     Green,
     Blue,
