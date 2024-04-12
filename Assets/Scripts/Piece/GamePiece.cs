@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using BoardMain;
@@ -85,17 +86,66 @@ namespace Piece
     
     private void OnMouseEnter()
     {
+      if (!BoardRef.IsGamePiecesClickable) return;
+      
+      if (BoardRef.SkillType != SkillType.Empty) return;
+      
       BoardRef.EnterPiece(this);
     }
 
     private void OnMouseDown()
     {
+      if (!BoardRef.IsGamePiecesClickable) return;
+
+      if (BoardRef.SkillType != SkillType.Empty)
+      {
+        SkillsProperties();
+
+        return;
+      }
+      
       BoardRef.PressPiece(this);
     }
 
     private void OnMouseUp()
     {
+      if (!BoardRef.IsGamePiecesClickable) return;
+
+      if (BoardRef.SkillType != SkillType.Empty) return;
+
       BoardRef.ReleasePiece();
+    }
+
+    private void SkillsProperties()
+    {
+      switch (BoardRef.SkillType)
+      {
+        case SkillType.Paint:
+          Paint();
+          break;
+        case SkillType.Break:
+          Break();
+          break;
+        case SkillType.Empty:
+        default:
+          throw new ArgumentOutOfRangeException();
+      }
+    }
+
+    private void Paint()
+    {
+      if (PieceType != PieceType.Normal)
+        return;
+      
+      BoardRef.PaintPiece(this);
+    }
+
+    private void Break()
+    {
+      if (PieceType != PieceType.Normal)
+        return;
+      
+      BoardRef.BreakPiece(X, Y);
     }
 
     public bool IsMovable()

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Enum;
 using Levels.Main;
+using Panel;
 using Piece;
 using Piece.Animation;
 using Unity.Mathematics;
@@ -23,7 +24,7 @@ namespace BoardMain
 
     [SerializeField]
     private float _fillTime;
-    
+
     [SerializeField]
     private GameObject _background;
 
@@ -33,13 +34,13 @@ namespace BoardMain
     [Header("Piece Prefabs")]
     [SerializeField]
     private List<PiecePrefab> _piecePrefabs;
-    
+
     private readonly Dictionary<PieceType, GameObject> _piecePrefabsDictionary = new();
 
     [Header("Initial Pieces")]
     [SerializeField]
     private List<PiecePosition> _initialPieces;
-    
+
     private GamePiece[,] pieces;
 
     private bool inverse;
@@ -50,6 +51,7 @@ namespace BoardMain
 
     private bool _gameOver;
 
+    public bool IsGamePiecesClickable { get; private set; } = true;
     public bool IsFilling { get; private set; }
 
     private bool _isSwapping;
@@ -93,12 +95,12 @@ namespace BoardMain
       for (int i = 0; i < _initialPieces.Count; i++)
       {
         if (_initialPieces[i].x >= 0 && _initialPieces[i].x < _width
-                                    && _initialPieces[i].y >= 0 && _initialPieces[i].y < _height)
+                                     && _initialPieces[i].y >= 0 && _initialPieces[i].y < _height)
         {
           SpawnNewPiece(_initialPieces[i].x, _initialPieces[i].y, _initialPieces[i].type);
         }
       }
-    
+
       for (int x = 0; x < _width; x++)
       {
         for (int y = 0; y < _height; y++)
@@ -132,7 +134,7 @@ namespace BoardMain
     public IEnumerator Fill(float time = 0f)
     {
       yield return new WaitForSeconds(time);
-      
+
       bool needsRefill = true;
       IsFilling = true;
 
@@ -140,17 +142,15 @@ namespace BoardMain
       {
         yield return 0;
       }
-      
+
       while (needsRefill)
       {
-
         yield return new WaitForSeconds(_fillTime);
 
         while (FillStep())
         {
           inverse = !inverse;
           yield return new WaitForSeconds(_fillTime);
-
         }
 
         needsRefill = ClearAllValidMatches();
@@ -192,7 +192,7 @@ namespace BoardMain
             for (int diag = -1; diag <= 1; diag++)
             {
               if (diag == 0) continue;
-            
+
               int diagX = x + diag;
 
               if (inverse)
@@ -259,10 +259,11 @@ namespace BoardMain
     }
 
     private const float _swapPieceTime = 0.15f;
+
     public void SwapPieces(GamePiece piece1, GamePiece piece2)
     {
       if (_gameOver || IsFilling || _isSwapping) return;
-    
+
       if (!piece1.IsMovable() || !piece2.IsMovable()) return;
 
       pieces[piece1.X, piece1.Y] = piece2;
@@ -275,7 +276,7 @@ namespace BoardMain
                                                        || piece1.PieceType == PieceType.Bomb || piece2.PieceType == PieceType.Bomb)
       {
         _isSwapping = true;
-        
+
         int piece1X = piece1.X;
         int piece1Y = piece1.Y;
 
@@ -287,13 +288,13 @@ namespace BoardMain
         if (piece1.PieceType == PieceType.Rainbow && piece1.IsClearable() && piece2.IsColored())
         {
           matchKey = MatchKey.Rainbow;
-          
+
           RainbowSuper(piece1, piece2);
         }
         else if (piece2.PieceType == PieceType.Rainbow && piece2.IsClearable() && piece1.IsColored())
         {
           matchKey = MatchKey.Rainbow;
-          
+
           RainbowSuper(piece2, piece1);
         }
 
@@ -302,9 +303,10 @@ namespace BoardMain
           if (piece1.PieceType == PieceType.RowClear || piece1.PieceType == PieceType.ColumnClear)
           {
             matchKey = MatchKey.Column;
-            
+
             RocketSuper(piece1, piece2);
           }
+
           if (piece2.PieceType == PieceType.RowClear || piece2.PieceType == PieceType.ColumnClear)
           {
             matchKey = MatchKey.Row;
@@ -324,18 +326,18 @@ namespace BoardMain
           else if (piece2.PieceType == PieceType.Bomb)
           {
             matchKey = MatchKey.Bomb;
-            
+
             Bomb(piece2, piece1);
           }
         }
-        
+
         ClearAllValidMatches();
 
         _enteredPiece = null;
         _pressedPiece = null;
 
         StartCoroutine(Fill());
-      
+
         Level.OnMove();
 
         _isSwapping = false;
@@ -349,24 +351,24 @@ namespace BoardMain
     private IEnumerator InvalidSwap(GamePiece piece1, GamePiece piece2)
     {
       _isSwapping = true;
-      
+
       int piece1X = piece1.X;
       int piece1Y = piece1.Y;
-      
+
       int piece2X = piece2.X;
       int piece2Y = piece2.Y;
-        
+
       piece1.MovableComponent.Move(piece2X, piece2Y, _swapPieceTime);
       piece2.MovableComponent.Move(piece1X, piece1Y, _swapPieceTime);
-      
+
       yield return new WaitForSeconds(0.3f);
-      
+
       piece1.MovableComponent.Move(piece1X, piece1Y, _swapPieceTime);
       piece2.MovableComponent.Move(piece2X, piece2Y, _swapPieceTime);
-      
+
       pieces[piece1.X, piece1.Y] = piece1;
       pieces[piece2.X, piece2.Y] = piece2;
-      
+
       _isSwapping = false;
     }
 
@@ -382,6 +384,9 @@ namespace BoardMain
 
     public void ReleasePiece()
     {
+      if (_pressedPiece == null || _enteredPiece == null)
+        return;
+
       if (IsAdjacent(_pressedPiece, _enteredPiece))
       {
         SwapPieces(_pressedPiece, _enteredPiece);
@@ -555,7 +560,7 @@ namespace BoardMain
               else break;
             }
           }
-             
+
           if (horizontalPieces.Count < 2)
           {
             horizontalPieces.Clear();
@@ -566,7 +571,7 @@ namespace BoardMain
             {
               matchingPieces.Add(horizontalPieces[j]);
             }
-          
+
             break;
           }
         }
@@ -592,11 +597,11 @@ namespace BoardMain
           List<GamePiece> match = GetMatch(pieces[x, y], x, y);
 
           if (match == null) continue;
-          _objectDestroying = true;
+          SetObjectDestroying(true);
 
           PieceType specialPieceType = PieceType.Count;
           GamePiece randomPiece = match[Random.Range(0, match.Count)];
-          
+
           int specialPieceX = randomPiece.X;
           int specialPieceY = randomPiece.Y;
 
@@ -619,7 +624,7 @@ namespace BoardMain
           {
             specialPieceType = CheckRainbowOrBomb(match);
           }
-        
+
           for (int i = 0; i < match.Count; i++)
           {
             if (!ClearPiece(match[i].X, match[i].Y)) continue;
@@ -646,6 +651,10 @@ namespace BoardMain
           {
             newPiece.SetPieceTypeInitial(PieceType.Rainbow, ColorType.Any);
           }
+          else if (specialPieceType == PieceType.Bomb && newPiece.IsColored())
+          {
+            newPiece.SetPieceTypeInitial(PieceType.Bomb, ColorType.Any);
+          }
         }
       }
 
@@ -656,7 +665,7 @@ namespace BoardMain
     {
       int xCount = 0;
       int yCount = 0;
-      
+
       for (int i = 0; i < matches.Count - 1; i++)
       {
         if (matches[i].X == matches[i + 1].X)
@@ -674,7 +683,7 @@ namespace BoardMain
       {
         return PieceType.Rainbow;
       }
-      
+
       return PieceType.Bomb;
     }
 
@@ -683,17 +692,16 @@ namespace BoardMain
       GamePiece piece = pieces[x, y];
 
       if (!piece.IsClearable() || piece.ClearableComponent.IsBeingCleared) return false;
-      
+
       piece.ClearableComponent.Clear();
 
       if (piece.PieceType == PieceType.Normal)
       {
-        StartCoroutine(StartDestroyAnimation(piece));  
+        StartCoroutine(StartDestroyAnimation(piece));
       }
 
       SpawnNewPiece(x, y, PieceType.Empty);
       ClearObstacles(x, y);
-
 
       return true;
     }
@@ -714,9 +722,9 @@ namespace BoardMain
         {
           GamePiece piece = pieces[adjacentX, y];
           if (piece.PieceType != PieceType.Obstacle || !piece.IsClearable()) continue;
-        
+
           bool isCleared = piece.ClearableComponent.Clear();
-          
+
           if (isCleared)
           {
             SpawnNewPiece(adjacentX, y, PieceType.Empty);
@@ -758,12 +766,13 @@ namespace BoardMain
     }
 
     private const int _chanceOfCreatingSpecialObjectByRainbow = 20;
+
     public void RainbowSuper(GamePiece rainbowPiece, GamePiece anotherPiece)
     {
-      _objectDestroying = true;
-      
+      SetObjectDestroying(true);
+
       rainbowPiece.GetComponent<RainbowPiece>().SetPieces(rainbowPiece, anotherPiece);
-      
+
       rainbowPiece.ClearableComponent.Clear();
     }
 
@@ -775,7 +784,7 @@ namespace BoardMain
         {
           if (x == rainbowPiece.X && y == rainbowPiece.Y)
             ClearPiece(x, y);
-          
+
           if (anotherPiece.PieceType == PieceType.Rainbow)
           {
             ClearPiece(x, y);
@@ -784,7 +793,7 @@ namespace BoardMain
           {
             if (x == anotherPiece.X && y == anotherPiece.Y)
               anotherPiece.ClearableComponent.Clear();
-            
+
             if (Random.Range(0, 101) >= _chanceOfCreatingSpecialObjectByRainbow || pieces[x, y].PieceType != PieceType.Normal) continue;
 
             GamePiece gamePiece = DestroyAndCreateNewPiece(pieces[x, y], x, y, PieceType.Bomb, ColorType.Any);
@@ -796,7 +805,7 @@ namespace BoardMain
               anotherPiece.ClearableComponent.Clear();
 
             if (Random.Range(0, 101) >= _chanceOfCreatingSpecialObjectByRainbow || pieces[x, y].PieceType != PieceType.Normal) continue;
-            
+
             PieceType newPieceType = Random.Range(0, 2) == 0 ? PieceType.RowClear : PieceType.ColumnClear;
             GamePiece gamePiece = DestroyAndCreateNewPiece(pieces[x, y], x, y, newPieceType, ColorType.Any);
             gamePiece.ClearableComponent.Clear();
@@ -811,8 +820,8 @@ namespace BoardMain
 
     public void RocketSuper(GamePiece rocketPiece, GamePiece anotherPiece)
     {
-      _objectDestroying = true;
-      
+      SetObjectDestroying(true);
+
       if (anotherPiece.PieceType == PieceType.ColumnClear || anotherPiece.PieceType == PieceType.RowClear)
       {
         switch (rocketPiece.PieceType)
@@ -892,6 +901,11 @@ namespace BoardMain
       return pieces[x, y];
     }
 
+    public void SetPieceClickable(bool value)
+    {
+      IsGamePiecesClickable = value;
+    }
+
     private const float _destroyingObjectTime = 0.5f;
 
     public void FinishDestroyingObjectCallers(float time = _destroyingObjectTime)
@@ -906,18 +920,26 @@ namespace BoardMain
 
       _objectDestroying = false;
     }
+    
+    public void SetObjectDestroying(bool value)
+    {
+      _objectDestroying = value;
+    }
 
     private const float _standardFillTime = 0.1f;
+
     public void Fillers(float newFillTime = _standardFillTime)
     {
       ChangeFillTime(newFillTime);
-      
+
       ClearAllValidMatches();
 
       StartCoroutine(Fill());
     }
 
-    private void ChangeFillTime(float newFillTime = _standardFillTime)
+
+
+  private void ChangeFillTime(float newFillTime = _standardFillTime)
     {
       _fillTime = newFillTime;
     }
@@ -959,5 +981,38 @@ namespace BoardMain
 
       return gamePieces;
     }
+
+    #region Skills
+
+    public SkillType SkillType { get; private set; } = SkillType.Empty;
+
+    [Header("Skills")]
+    public SkillPanel SkillPanel;
+
+    public void SetSkillType(SkillType skillType)
+    {
+      SkillType = skillType;
+    }
+
+    public void PaintPiece(GamePiece piece)
+    {
+      piece.ColorComponent.SetColor(SkillPanel.GetColorType());
+      Fillers();
+
+      SkillPanel.DecreaseSkillCount(SkillType.Paint);
+      SetSkillType(SkillType.Empty);
+    }
+
+    public void BreakPiece(int x, int y)
+    {
+      SkillPanel.DecreaseSkillCount(SkillType.Break);
+      
+      SetObjectDestroying(true);
+      ClearPiece(x, y);
+      Fillers();
+      SetSkillType(SkillType.Empty);
+    }
+
+    #endregion
   }
 }

@@ -8,14 +8,14 @@ namespace Piece
   public class ColorPiece : MonoBehaviour
   {
     [SerializeField]
+    private ColorType _color;
+    
+    [SerializeField]
     private List<ColorSprite> _colorSprites;
     
     private readonly Dictionary<ColorType, Sprite> _colorSpriteDictionary = new();
 
     private SpriteRenderer _spriteRenderer;
-
-    [SerializeField]
-    private ColorType _color;
 
     public int ColorNumber => _colorSprites.Count;
 
