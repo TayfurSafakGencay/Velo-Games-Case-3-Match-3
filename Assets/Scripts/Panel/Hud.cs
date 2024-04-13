@@ -16,7 +16,7 @@ namespace Panel
 
         public GameOverPanel GameOverPanel;
 
-        [Header("Remaining Part")]
+        [Header("Moves/Times")]
         [SerializeField]
         private TextMeshProUGUI _remainingText;
 
@@ -26,9 +26,6 @@ namespace Panel
         [Header("Target Score")]
         [SerializeField]
         private TextMeshProUGUI _targetScoreText;
-
-        [SerializeField]
-        private TextMeshProUGUI _targetTitleText;
 
         [Header("Score")]
         [SerializeField]
@@ -133,23 +130,22 @@ namespace Panel
             switch (levelType)
             {
                 case Level.LevelType.Moves:
-                    SetTitles("Moves Remaining", "Target Score");
+                    SetTitles("Moves");
                     break;
                 case Level.LevelType.Obstacle:
-                    SetTitles("Moves Remaining", "Obstacles Remaining");
+                    SetTitles("Moves");
                     break;
                 case Level.LevelType.Timer:
-                    SetTitles("Time Remaining", "Target Score");
+                    SetTitles("Time");
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(levelType), levelType, null);
             }
         }
 
-        private void SetTitles(string remainingTitleText, string targetTitleText)
+        private void SetTitles(string remainingTitleText)
         {
             _remainingTitleText.text = remainingTitleText;
-            _targetTitleText.text = targetTitleText;
         }
 
         public void OnGameWin(int score)
