@@ -11,6 +11,11 @@ namespace Piece
 
     public override bool Clear()
     {
+      if (IsStartedAnimation) return true;
+      IsStartedAnimation = true;
+
+      _piece.BoardRef.IncreaseDestroyingObjectCount();
+
       StartCoroutine(BeforeDestroyEffect(1));
 
       return true;

@@ -88,7 +88,7 @@ namespace Piece
     {
       if (!BoardRef.IsGamePiecesClickable) return;
       
-      if (BoardRef.SkillType != SkillType.Empty) return;
+      if (BoardRef.SkillKey != SkillKey.Empty) return;
       
       BoardRef.EnterPiece(this);
     }
@@ -97,7 +97,7 @@ namespace Piece
     {
       if (!BoardRef.IsGamePiecesClickable) return;
 
-      if (BoardRef.SkillType != SkillType.Empty)
+      if (BoardRef.SkillKey != SkillKey.Empty)
       {
         SkillsProperties();
 
@@ -111,22 +111,22 @@ namespace Piece
     {
       if (!BoardRef.IsGamePiecesClickable) return;
 
-      if (BoardRef.SkillType != SkillType.Empty) return;
+      if (BoardRef.SkillKey != SkillKey.Empty) return;
 
       BoardRef.ReleasePiece();
     }
 
     private void SkillsProperties()
     {
-      switch (BoardRef.SkillType)
+      switch (BoardRef.SkillKey)
       {
-        case SkillType.Paint:
+        case SkillKey.Paint:
           Paint();
           break;
-        case SkillType.Break:
+        case SkillKey.Break:
           Break();
           break;
-        case SkillType.Empty:
+        case SkillKey.Empty:
         default:
           throw new ArgumentOutOfRangeException();
       }

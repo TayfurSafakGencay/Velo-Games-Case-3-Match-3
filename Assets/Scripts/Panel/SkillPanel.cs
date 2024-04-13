@@ -1,8 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using BoardMain;
+using DG.Tweening;
 using Enum;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
+using Vo;
 
 namespace Panel
 {
@@ -14,52 +20,86 @@ namespace Panel
     [SerializeField]
     private GameObject _selectColorPanel;
 
-    [Header("Skill Count")]
-    [SerializeField]
-    private TextMeshProUGUI _paintPieceText;
+    [Serializable]
+    public struct Skill
+    {
+      public SkillKey SkillKey;
+      
+      public void SetSkillCount(int newValue)
+      {
+        SkillCount = newValue;
+      }
+      
+      public int SkillCount;
+      
+      public Button SkillButton;
+      
+      public TextMeshProUGUI SkillCountText;
+      
+      public Image SkillCountBackground;
+    }
 
-    private int _paintPieceCount;
-    
-    [SerializeField]
-    private TextMeshProUGUI _breakPieceText;
+    public List<Skill> SkillList;
 
-    private int _breakPieceCount;
+    private readonly Dictionary<SkillKey, Skill> _skillDictionary = new();
 
     private void Awake()
     {
+      for (int i = 0; i < SkillList.Count; i++)
+      {
+        Skill skill = SkillList[i];
+        _skillDictionary.Add(skill.SkillKey, skill);
+      }
+      
+      gameObject.SetActive(true);
       _selectColorPanel.gameObject.SetActive(false);
     }
 
-    public void Init(int breakPieceCount, int paintPieceCount)
+    public void Init(List<SkillVo> skillVos)
     {
-      _paintPieceCount = paintPieceCount;
-      _breakPieceCount = breakPieceCount;
+      for (int i = 0; i < skillVos.Count; i++)
+      {
+        SkillVo skillVo = skillVos[i];
+        _skillDictionary[skillVo.SkillKey].SetSkillCount(skillVo.SkillCount);
+      }
 
       UpdateTexts();
     }
+
+    private const float _scaleButton = 1.15f;
 
     #region Paint
 
     public void OnSetActivePaintPanel()
     {
-      if (_selectColorPanel.activeInHierarchy)
-      {
-        _selectColorPanel.SetActive(false);
-        _board.SetPieceClickable(true);
-      }
-      else
+      if (_board.SkillKey == SkillKey.Empty)
       {
         _selectColorPanel.SetActive(true);
         _board.SetPieceClickable(false);
+        
+        _skillDictionary[SkillKey.Paint].SkillButton.transform.DOScale(_scaleButton, 0.5f);
+
+        _board.SetSkillType(SkillKey.Paint);
+         
+         
+      }
+      else if (_board.SkillKey == SkillKey.Paint)
+      {
+        _selectColorPanel.SetActive(false);
+        _board.SetPieceClickable(true);
+        
+        _skillDictionary[SkillKey.Paint].SkillButton.transform.DOScale(1, 0.5f);
+        
+        _board.SetSkillType(SkillKey.Empty);
       }
     }
 
     private ColorType _colorType;
     public void OnPaintPiece(int colorType)
     {
-      OnSetActivePaintPanel();
+      _selectColorPanel.SetActive(false);
+      _board.SetPieceClickable(true);
       
-      _board.SetSkillType(SkillType.Paint);
       _colorType = (ColorType)colorType;
     }
 
@@ -73,33 +113,44 @@ namespace Panel
 
     public void OnBreakPiece()
     {
-      _board.SetSkillType(SkillType.Break);
+      if (_board.SkillKey == SkillKey.Empty)
+      {
+        _board.SetSkillType(SkillKey.Break);
+
+        _skillDictionary[SkillKey.Break].SkillButton.transform.DOScale(_scaleButton, 0.5f);
+      }
+      else if (_board.SkillKey == SkillKey.Break)
+      {
+        _board.SetSkillType(SkillKey.Empty);
+
+        _skillDictionary[SkillKey.Break].SkillButton.transform.DOScale(1, 0.5f);
+      }
     }
 
-    public void DecreaseSkillCount(SkillType skillType)
+    public void DecreaseSkillCount(SkillKey skillKey)
     {
-      switch (skillType)
-      {
-        case SkillType.Break:
-          _breakPieceCount--;
-          break;
-        case SkillType.Paint:
-          _paintPieceCount--;
-          break;
-        case SkillType.Empty:
-          break;
-        default:
-          throw new ArgumentOutOfRangeException();
-      }
-      
-      UpdateTexts();
+      Skill skill = _skillDictionary[skillKey];
+      skill.SetSkillCount(skill.SkillCount - 1);
+      _skillDictionary[skillKey] = skill;
+
+      _skillDictionary[skillKey].SkillButton.transform.DOScale(1, 0.5f);
+
+      UpdateText(skillKey);
     }
     
 
     private void UpdateTexts()
     {
-      _paintPieceText.text = _paintPieceCount.ToString();
-      _breakPieceText.text = _breakPieceCount.ToString();
+      for (int i = 0; i < _skillDictionary.Count; i++)
+      {
+        UpdateText(_skillDictionary.ElementAt(i).Key);
+      }
+    }
+
+    private void UpdateText(SkillKey skillKey)
+    {
+      Skill skill = _skillDictionary[skillKey];
+      skill.SkillCountText.text = skill.SkillCount.ToString();
     }
   }
 }

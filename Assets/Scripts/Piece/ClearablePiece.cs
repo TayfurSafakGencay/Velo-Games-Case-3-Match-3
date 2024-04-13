@@ -12,6 +12,8 @@ namespace Piece
 
         public bool IsBeingCleared => _isBeingCleared;
 
+        public bool IsStartedAnimation { get; set; } = false;
+
         protected GamePiece _piece;
 
         protected SpriteRenderer _spriteRenderer;
@@ -44,7 +46,7 @@ namespace Piece
             {
                 Destroy(gameObject);
 
-                _piece.BoardRef.FinishDestroyingObjectCallers(0f);
+                _piece.BoardRef.FinishDestroyingObjectCallers(0f, _piece.PieceType);
             });
         }
 

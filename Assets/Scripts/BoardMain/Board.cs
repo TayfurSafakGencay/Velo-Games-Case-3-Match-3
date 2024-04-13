@@ -58,6 +58,8 @@ namespace BoardMain
 
     private bool _objectDestroying;
 
+    private int _destroyingObjectCount;
+
     private void Awake()
     {
       AddPrefabsToDictionary();
@@ -694,7 +696,7 @@ namespace BoardMain
       if (!piece.IsClearable() || piece.ClearableComponent.IsBeingCleared) return false;
 
       piece.ClearableComponent.Clear();
-
+      
       if (piece.PieceType == PieceType.Normal)
       {
         StartCoroutine(StartDestroyAnimation(piece));
@@ -908,8 +910,17 @@ namespace BoardMain
 
     private const float _destroyingObjectTime = 0.5f;
 
-    public void FinishDestroyingObjectCallers(float time = _destroyingObjectTime)
+    public void FinishDestroyingObjectCallers(float time = _destroyingObjectTime, PieceType pieceType = PieceType.Normal)
     {
+      if (_destroyingObjectCount > 0)
+      {
+        if (pieceType == PieceType.Normal) return;
+
+        _destroyingObjectCount--;
+
+        if (_destroyingObjectCount > 0) return;
+      }
+
       StopCoroutine(FinishDestroyingObject(time));
       StartCoroutine(FinishDestroyingObject(time));
     }
@@ -920,7 +931,12 @@ namespace BoardMain
 
       _objectDestroying = false;
     }
-    
+
+    public void IncreaseDestroyingObjectCount()
+    {
+      _destroyingObjectCount++;
+    }
+
     public void SetObjectDestroying(bool value)
     {
       _objectDestroying = value;
@@ -937,9 +953,7 @@ namespace BoardMain
       StartCoroutine(Fill());
     }
 
-
-
-  private void ChangeFillTime(float newFillTime = _standardFillTime)
+    private void ChangeFillTime(float newFillTime = _standardFillTime)
     {
       _fillTime = newFillTime;
     }
@@ -984,14 +998,14 @@ namespace BoardMain
 
     #region Skills
 
-    public SkillType SkillType { get; private set; } = SkillType.Empty;
+    public SkillKey SkillKey { get; private set; } = SkillKey.Empty;
 
     [Header("Skills")]
     public SkillPanel SkillPanel;
 
-    public void SetSkillType(SkillType skillType)
+    public void SetSkillType(SkillKey skillKey)
     {
-      SkillType = skillType;
+      SkillKey = skillKey;
     }
 
     public void PaintPiece(GamePiece piece)
@@ -999,18 +1013,18 @@ namespace BoardMain
       piece.ColorComponent.SetColor(SkillPanel.GetColorType());
       Fillers();
 
-      SkillPanel.DecreaseSkillCount(SkillType.Paint);
-      SetSkillType(SkillType.Empty);
+      SkillPanel.DecreaseSkillCount(SkillKey.Paint);
+      SetSkillType(SkillKey.Empty);
     }
 
     public void BreakPiece(int x, int y)
     {
-      SkillPanel.DecreaseSkillCount(SkillType.Break);
-      
+      SkillPanel.DecreaseSkillCount(SkillKey.Break);
+
       SetObjectDestroying(true);
       ClearPiece(x, y);
       Fillers();
-      SetSkillType(SkillType.Empty);
+      SetSkillType(SkillKey.Empty);
     }
 
     #endregion

@@ -1026,7 +1026,7 @@ GameObject:
   - component: {fileID: 93673459}
   - component: {fileID: 93673458}
   m_Layer: 5
-  m_Name: CountBG
+  m_Name: PaintCountBG
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1786,7 +1786,7 @@ GameObject:
   - component: {fileID: 251627694}
   - component: {fileID: 251627693}
   m_Layer: 5
-  m_Name: HammerButton
+  m_Name: BreakButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3057,8 +3057,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _board: {fileID: 787276510}
   _selectColorPanel: {fileID: 1056651340}
-  _paintPieceText: {fileID: 1267455838}
-  _breakPieceText: {fileID: 661710197}
+  SkillList:
+  - SkillKey: 1
+    SkillCount: 0
+    SkillButton: {fileID: 2036864795}
+    SkillCountText: {fileID: 1267455838}
+    SkillCountBackground: {fileID: 93673458}
+  - SkillKey: 2
+    SkillCount: 0
+    SkillButton: {fileID: 251627693}
+    SkillCountText: {fileID: 661710197}
+    SkillCountBackground: {fileID: 2109007175}
 --- !u!1 &1056651340
 GameObject:
   m_ObjectHideFlags: 0
@@ -4526,7 +4535,7 @@ GameObject:
   - component: {fileID: 2109007176}
   - component: {fileID: 2109007175}
   m_Layer: 5
-  m_Name: CountBG
+  m_Name: BreakCountBG
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -1,6 +1,6 @@
 ﻿namespace Enum
 {
-  public enum SkillType
+  public enum SkillKey
   {
     Empty,
     Paint,
