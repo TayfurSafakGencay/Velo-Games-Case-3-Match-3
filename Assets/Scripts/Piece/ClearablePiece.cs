@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using DG.Tweening;
 using DG.Tweening.Core;
@@ -38,16 +39,21 @@ namespace Piece
         private TweenerCore<Color, Color, ColorOptions> _fadeAnimation;
         protected void DestroyAnimation()
         {
+            if (_isBeingCleared)
+                return;
+
+            _scaleAnimation = transform.DOScale(transform.localScale * 1.5f, 0.5f).SetEase(Ease.OutQuad);
+
+            _fadeAnimation = _spriteRenderer.DOFade(0f, 0.5f).SetEase(Ease.OutQuad).OnComplete(DirectDestroy);
+        }
+
+        protected void DirectDestroy()
+        {
             _isBeingCleared = true;
-
-             _scaleAnimation = transform.DOScale(transform.localScale * 1.5f, 0.5f).SetEase(Ease.OutQuad);
-
-            _fadeAnimation = _spriteRenderer.DOFade(0f, 0.5f).SetEase(Ease.OutQuad).OnComplete(() =>
-            {
-                Destroy(gameObject);
-
-                _piece.BoardRef.FinishDestroyingObjectCallers(0f, _piece.PieceType);
-            });
+            
+            _piece.BoardRef.FinishDestroyingObjectCallers(0f, _piece.PieceType);
+            
+            Destroy(gameObject);
         }
 
         protected TweenerCore<Vector3, Vector3, VectorOptions> _explosionEffect;
@@ -64,6 +70,11 @@ namespace Piece
             _scaleAnimation.Kill();
             _fadeAnimation.Kill();
             _explosionEffect.Kill();
+        }
+
+        private void OnTriggerEnter2D(Collider2D other)
+        {
+            _piece.BoardRef.ClearPiece(_piece.X, _piece.Y);
         }
 
         public virtual IEnumerator BeforeDestroyEffect(float time)

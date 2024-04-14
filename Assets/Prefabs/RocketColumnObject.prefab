@@ -148,10 +148,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: adc311dc113fdd448b4ddb3a6d08de70, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _color: 6
   _colorSprites:
   - Color: 6
     Sprite: {fileID: 21300000, guid: 192251f44965106408b100bc07886fa6, type: 3}
-  _color: 6
 --- !u!114 &8335861806563444821
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -165,6 +165,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   IsRow: 0
+  HalfRocket: {fileID: 8771840423264288335, guid: 0426d322c38944b4289a41b63cc3f71e, type: 3}
 --- !u!61 &8510716369522727511
 BoxCollider2D:
   m_ObjectHideFlags: 0

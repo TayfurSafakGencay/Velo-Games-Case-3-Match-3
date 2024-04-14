@@ -751,20 +751,77 @@ namespace BoardMain
       }
     }
 
-    public void RowRocket(int row)
+    [SerializeField]
+    private Transform _rocketPool;
+    
+    private readonly Queue<GameObject> objectPoolQueue = new();
+    
+    private const float _rocketDisableTime = 1.5f;
+
+    public void RowRocket(GameObject halfRocket, int x, int y)
     {
-      for (int x = 0; x < _width; x++)
+      ClearPiece(x, y);
+
+      GetRocketFromPool(out GameObject leftRocket, out GameObject rightRocket, halfRocket);
+      
+      SetHalfRocket(leftRocket, new Vector2(x - 1, y), Quaternion.Euler(0,0,90), "Left Rocket");
+      SetHalfRocket(rightRocket, new Vector2(x + 1, y), Quaternion.Euler(0,0,270), "Right Rocket");
+      
+      // StartCoroutine(ClearRowRocket(y, _rocketDisableTime));
+    }
+
+    public void ColumnRocket(GameObject halfRocket, int x, int y)
+    {
+      ClearPiece(x, y);
+      
+      GetRocketFromPool(out GameObject upRocket, out GameObject downRocket, halfRocket);
+      
+      SetHalfRocket(upRocket, new Vector2(x, y + 1), Quaternion.Euler(0,0,180), "Up Rocket");
+      SetHalfRocket(downRocket, new Vector2(x, y - 1), Quaternion.Euler(0,0,0), "Down Rocket");
+
+      // StartCoroutine(ClearColumnRocket(x, _rocketDisableTime));
+    }
+
+    private void SetHalfRocket(GameObject rocket, Vector2 pos, Quaternion rotation, string newName)
+    {
+      rocket.transform.position = GetWorldPosition((int)pos.x, (int)pos.y);
+      rocket.transform.localRotation = rotation;
+      rocket.name = newName;
+      rocket.SetActive(true);
+    }
+
+    private void GetRocketFromPool(out GameObject rocket1, out GameObject rocket2, GameObject halfRocket)
+    {
+      if (objectPoolQueue.Count > 1)
       {
-        ClearPiece(x, row);
+        rocket1 = objectPoolQueue.Dequeue();
+        rocket2 = objectPoolQueue.Dequeue();
+
+        StartCoroutine(AddToPool(_rocketDisableTime, rocket1));
+        StartCoroutine(AddToPool(_rocketDisableTime, rocket2));
+      }
+      else
+      {
+        rocket1 = CreateHalfRocket(halfRocket);
+        rocket2 = CreateHalfRocket(halfRocket);
       }
     }
 
-    public void ColumnRocket(int column)
+    private GameObject CreateHalfRocket(GameObject halfRocket)
     {
-      for (int y = 0; y < _height; y++)
-      {
-        ClearPiece(column, y);
-      }
+      GameObject newRocketObject = Instantiate(halfRocket, Vector3.zero, quaternion.identity, _rocketPool);
+      newRocketObject.SetActive(false);
+      newRocketObject.GetComponent<Rocket>().SetBoard(this);
+      
+      StartCoroutine(AddToPool(_rocketDisableTime, newRocketObject));
+      
+      return newRocketObject;
+    }
+
+    private IEnumerator AddToPool(float time, GameObject rocket)
+    {
+      yield return new WaitForSeconds(time);
+      objectPoolQueue.Enqueue(rocket);
     }
 
     private const int _chanceOfCreatingSpecialObjectByRainbow = 20;
@@ -866,6 +923,30 @@ namespace BoardMain
       }
     }
 
+    public IEnumerator ClearRowRocket(int row, float time)
+    {
+      yield return new WaitForSeconds(time);
+
+      for (int i = 0; i < _width; i++)
+      {
+        ClearPiece(i, row);
+      }
+      print("CRR");
+      Fillers();
+    }
+    
+    public IEnumerator ClearColumnRocket(int column, float time)
+    {
+      yield return new WaitForSeconds(time);
+      
+      for (int y = 0; y < _height; y++)
+      {
+        ClearPiece(column, y);
+      }
+      print("CCR");
+      Fillers();
+    }
+
     public void Bomb(GamePiece bombPiece, GamePiece anotherPiece)
     {
       if (anotherPiece.PieceType == PieceType.Normal)
@@ -908,7 +989,7 @@ namespace BoardMain
       IsGamePiecesClickable = value;
     }
 
-    private const float _destroyingObjectTime = 0.5f;
+    private const float _destroyingObjectTime = 0.0f;
 
     public void FinishDestroyingObjectCallers(float time = _destroyingObjectTime, PieceType pieceType = PieceType.Normal)
     {

@@ -12,9 +12,9 @@ namespace Piece
       if (IsStartedAnimation) return true;
       IsStartedAnimation = true;
       
-      _piece.BoardRef.IncreaseDestroyingObjectCount();
+      // _piece.BoardRef.IncreaseDestroyingObjectCount();
 
-      StartCoroutine(BeforeDestroyEffect(1));
+      StartCoroutine(BeforeDestroyEffect(0f));
       
       return true;
     }
