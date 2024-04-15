@@ -41,7 +41,7 @@ public class AuthManager : MonoBehaviour
     public void Register(
         string email,
         string password,
-        Action<string> onRegisterSuccess = null,
+        Action<string, string> onRegisterSuccess = null,
         Action<string> onRegisterFailed = null
     )
     {

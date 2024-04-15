@@ -38,10 +38,11 @@ public class RegisterUIActions : AuthUIActions
         AuthManager.Instance.Register(
             email,
             password,
-            (userId) =>
+            (userId, userEmail) =>
             {
                 DatabaseManager.Instance.CreateUser(
                     userId,
+                    userEmail,
                     () =>
                     {
                         DatabaseManager.Instance.GetCurrentUser(

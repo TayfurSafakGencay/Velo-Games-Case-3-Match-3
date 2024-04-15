@@ -19,7 +19,7 @@ public abstract class AbstractAuthProvider : MonoBehaviour
     public abstract void Register(
         string email,
         string password,
-        Action<string> onRegisterSuccess,
+        Action<string, string> onRegisterSuccess,
         Action<string> onRegisterFailed
     );
 }
