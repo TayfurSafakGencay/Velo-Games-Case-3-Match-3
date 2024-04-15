@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿//Author: Şafak Gencay & Tamer Erdoğan
+
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -43,6 +45,21 @@ namespace Panel
 
             _titleText.text = "You Win";
             _scoreText.text = finalScore.ToString();
+
+            int newScore = SaveOnDeviceHelper.AddUserScore(finalScore);
+
+            //TODO: Update işlemi async olduğu için, burada UI tarafında bir loading
+            //hazırlanmalı ve loading state'i burada true yapılmalı
+            DatabaseManager.Instance.UpdateUserFields(
+                level,
+                newScore,
+                () => {
+                    // TODO: Kullanıcı verisi başarıyla güncellendi. UI'ın loading'i kapatılmalı
+                },
+                () => {
+                    // TODO: Kullanıcı verisi güncellenemedi. UI'ın loading'i kapatılmalı ve hata gibi birşey gösterilmeli
+                }
+            );
         }
 
         public void OnGameLose(int star, int finalScore, int level)
