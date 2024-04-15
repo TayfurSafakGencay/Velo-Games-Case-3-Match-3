@@ -44,8 +44,19 @@ public class RegisterUIActions : AuthUIActions
                     userId,
                     () =>
                     {
-                        SceneManager.LoadScene(_levelSelectSceneName);
-                        canvasGroup.interactable = true;
+                        DatabaseManager.Instance.GetCurrentUser(
+                            (UserFD user) =>
+                            {
+                                SaveOnDeviceHelper.SaveUser(user);
+                                SceneManager.LoadScene(_levelSelectSceneName);
+                                canvasGroup.interactable = true;
+                            },
+                            () =>
+                            {
+                                SetError("An error occurred while retrieving user information.");
+                                canvasGroup.interactable = true;
+                            }
+                        );
                     },
                     () =>
                     {

@@ -74,4 +74,12 @@ public class DatabaseManager : MonoBehaviour
     {
         _databaseProvider.GetLeaderboarData(onSuccess, onFailure);
     }
+
+    public void GetCurrentUser(Action<UserFD> onSuccess = null, Action onFailure = null)
+    {
+        _databaseProvider.GetCurrentUser(
+            (DocumentSnapshot userDoc) => onSuccess?.Invoke(userDoc.ConvertTo<UserFD>()),
+            onFailure
+        );
+    }
 }
