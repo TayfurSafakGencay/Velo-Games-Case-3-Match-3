@@ -25,7 +25,7 @@ namespace Panel
         {
             gameObject.SetActive(false);
         }
-    
+
         private void SetStars(int starCount)
         {
             for (int i = 0; i < _stars.Count; i++)
@@ -37,7 +37,7 @@ namespace Panel
         public void OnGameWin(int star, int finalScore, int level)
         {
             gameObject.SetActive(true);
-        
+
             _level = level;
             SetStars(star);
 
@@ -64,12 +64,11 @@ namespace Panel
         public void OnHome()
         {
             SceneManager.LoadScene("Level Select");
-            
         }
 
         public void OnNextLevel()
         {
-            int newLevel = _level + 1; 
+            int newLevel = _level + 1;
             SceneManager.LoadScene("Level " + newLevel);
         }
     }
