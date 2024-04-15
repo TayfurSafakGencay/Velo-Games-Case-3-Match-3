@@ -48,9 +48,14 @@ public class DatabaseManager : MonoBehaviour
     }
 #endif
 
-    public void CreateUser(string id, Action onSuccess = null, Action onFailure = null)
+    public void CreateUser(
+        string id,
+        string email,
+        Action onSuccess = null,
+        Action onFailure = null
+    )
     {
-        _databaseProvider.CreateUser(id, onSuccess, onFailure);
+        _databaseProvider.CreateUser(id, email, onSuccess, onFailure);
     }
 
     public void UpdateUserFields(

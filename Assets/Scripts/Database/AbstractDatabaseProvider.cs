@@ -9,7 +9,12 @@ public abstract class AbstractDatabaseProvider : MonoBehaviour
 {
     public abstract void Init();
 
-    public abstract void CreateUser(string id, Action onSuccess = null, Action onFailure = null);
+    public abstract void CreateUser(
+        string id,
+        string email,
+        Action onSuccess = null,
+        Action onFailure = null
+    );
 
     public abstract void GetCurrentUser(
         Action<DocumentSnapshot> onSuccess = null,

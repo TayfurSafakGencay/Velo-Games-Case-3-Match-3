@@ -48,7 +48,7 @@ public class FirebaseAuthProvider : AbstractAuthProvider
     public override void Register(
         string email,
         string password,
-        Action<string> onRegisterSuccess = null,
+        Action<string, string> onRegisterSuccess = null,
         Action<string> onRegisterFailed = null
     )
     {
@@ -58,7 +58,7 @@ public class FirebaseAuthProvider : AbstractAuthProvider
     IEnumerator RegisterRequest(
         string email,
         string password,
-        Action<string> onRegisterSuccess = null,
+        Action<string, string> onRegisterSuccess = null,
         Action<string> onRegisterFailed = null
     )
     {
@@ -66,7 +66,10 @@ public class FirebaseAuthProvider : AbstractAuthProvider
         yield return new WaitUntil(() => registerRequestTask.IsCompleted);
 
         if (registerRequestTask.Exception == null)
-            onRegisterSuccess?.Invoke(registerRequestTask.Result.User.UserId);
+            onRegisterSuccess?.Invoke(
+                registerRequestTask.Result.User.UserId,
+                registerRequestTask.Result.User.Email
+            );
         else
             onRegisterFailed?.Invoke(registerRequestTask.Exception.InnerException.Message);
     }

@@ -16,9 +16,14 @@ public class FirebaseDatabaseProvider : AbstractDatabaseProvider
         _firestore = FirebaseFirestore.DefaultInstance;
     }
 
-    public override void CreateUser(string id, Action onSuccess = null, Action onFailure = null)
+    public override void CreateUser(
+        string id,
+        string email,
+        Action onSuccess = null,
+        Action onFailure = null
+    )
     {
-        UserFD userFD = new UserFD { id = id };
+        UserFD userFD = new UserFD { id = id, email = email };
         StartCoroutine(CreateUserRequest(userFD, onSuccess, onFailure));
     }
 
