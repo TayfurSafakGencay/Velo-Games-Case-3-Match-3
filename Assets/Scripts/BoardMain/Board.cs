@@ -784,8 +784,6 @@ namespace BoardMain
 
     public async Task ColumnRocket(GameObject halfRocket, int x, int y, PieceType pieceType)
     {
-      ClearPiece(x, y);
-
       GetRocketFromPool(out GameObject upRocket, out GameObject downRocket, halfRocket);
 
       SetHalfRocket(upRocket, new Vector2(x, y + 1), Quaternion.Euler(0, 0, 180), "Up Rocket");
@@ -859,21 +857,23 @@ namespace BoardMain
             anotherPiece.SetPieceTypeInitial(PieceType.ColumnClear, ColorType.Any);
             break;
         }
+        rocketPiece.X = _pressedPiece.X; rocketPiece.Y = _pressedPiece.Y;
+        anotherPiece.X = _pressedPiece.X; anotherPiece.Y = _pressedPiece.Y;
 
-        rocketPiece.ClearableComponent.Clear();
-        anotherPiece.ClearableComponent.Clear();
+        rocketPiece.ClearableComponent.Activate();
+        anotherPiece.ClearableComponent.Activate();
       }
       else if (anotherPiece.PieceType == PieceType.Bomb)
       {
         GamePiece superRocketPiece = DestroyAndCreateNewPiece(_pressedPiece, _pressedPiece.X, _pressedPiece.Y, PieceType.SuperRocket, ColorType.Any);
-        superRocketPiece.ClearableComponent.Clear();
+        superRocketPiece.ClearableComponent.Activate();
 
         for (int x = _pressedPiece.X - 1; x <= _pressedPiece.X + 1; x++)
         {
           if (x == _pressedPiece.X || x < 0 || x >= _width) continue;
 
           GamePiece piece = DestroyAndCreateNewPiece(pieces[x, _pressedPiece.Y], x, _pressedPiece.Y, PieceType.ColumnClear, ColorType.Any);
-          piece.ClearableComponent.Clear();
+          piece.ClearableComponent.Activate();
         }
 
         for (int y = _pressedPiece.Y - 1; y <= _pressedPiece.Y + 1; y++)
@@ -881,7 +881,7 @@ namespace BoardMain
           if (y == _pressedPiece.Y || y < 0 || y >= _height) continue;
 
           GamePiece piece = DestroyAndCreateNewPiece(pieces[_pressedPiece.X, y], _pressedPiece.X, y, PieceType.RowClear, ColorType.Any);
-          piece.ClearableComponent.Clear();
+          piece.ClearableComponent.Activate();
         }
       }
       else if (anotherPiece.IsClearable() && anotherPiece.PieceType == PieceType.Normal)
