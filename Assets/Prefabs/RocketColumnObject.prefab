@@ -165,7 +165,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   IsRow: 0
-  HalfRocket: {fileID: 8771840423264288335, guid: 0426d322c38944b4289a41b63cc3f71e, type: 3}
+  _halfRocket: {fileID: 8771840423264288335, guid: 0426d322c38944b4289a41b63cc3f71e, type: 3}
 --- !u!61 &8510716369522727511
 BoxCollider2D:
   m_ObjectHideFlags: 0

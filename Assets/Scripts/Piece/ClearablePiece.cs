@@ -81,11 +81,6 @@ namespace Piece
             _explosionEffect.Kill();
         }
 
-        private void OnTriggerEnter2D(Collider2D other)
-        {
-            // _piece.BoardRef.ClearPiece(_piece.X, _piece.Y);
-        }
-
         public virtual IEnumerator BeforeDestroyEffect(float time)
         {
             yield break;

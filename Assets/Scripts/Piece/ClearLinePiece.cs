@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Threading.Tasks;
 using DG.Tweening;
 using Enum;
 using UnityEngine;
@@ -9,7 +10,8 @@ namespace Piece
   {
     public bool IsRow;
 
-    public GameObject HalfRocket;
+    [SerializeField]
+    private GameObject _halfRocket;
 
     public override void Activate()
     {
@@ -22,10 +24,10 @@ namespace Piece
       };
       
       _piece.BoardRef.IncreaseDestroyingObjectCount();
-
       
       StartCoroutine(BeforeDestroyEffect(0.25f));
     }
+
     public override bool Clear()
     {
       SpecialPieceDestroy();
@@ -43,16 +45,16 @@ namespace Piece
 
       if (_piece.PieceType == PieceType.SuperRocket)
       {
-        // _piece.BoardRef.RowRocket(HalfRocket, _piece.X, _piece.Y);
-        // _piece.BoardRef.ColumnRocket(_piece.X);
+        Task task1 = _piece.BoardRef.RowRocket(_halfRocket, _piece.X, _piece.Y, _piece.PieceType);
+        Task task2 = _piece.BoardRef.ColumnRocket(_halfRocket, _piece.X, _piece.Y, _piece.PieceType);
       }
       else if (IsRow)
       {
-        _piece.BoardRef.RowRocket(HalfRocket, _piece.X, _piece.Y, _piece.PieceType);
+        Task task1 = _piece.BoardRef.RowRocket(_halfRocket, _piece.X, _piece.Y, _piece.PieceType);
       }
       else if (!IsRow)
       {
-        _piece.BoardRef.ColumnRocket(HalfRocket, _piece.X, _piece.Y, _piece.PieceType);
+        Task task1 = _piece.BoardRef.ColumnRocket(_halfRocket, _piece.X, _piece.Y, _piece.PieceType);
       }
     }
   }
