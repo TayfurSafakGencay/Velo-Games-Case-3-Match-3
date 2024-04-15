@@ -13,21 +13,17 @@ public class DatabaseManager : MonoBehaviour
 
     void Awake()
     {
-        DontDestroyOnLoad(this);
         if (Instance == null)
             Instance = this;
         else
             Destroy(gameObject);
+
+        _databaseProvider = GetComponent<AbstractDatabaseProvider>();
+        _databaseProvider.Init();
     }
     #endregion Singleton
 
     private AbstractDatabaseProvider _databaseProvider;
-
-    void Start()
-    {
-        _databaseProvider = GetComponent<AbstractDatabaseProvider>();
-        _databaseProvider.Init();
-    }
 
 #if UNITY_EDITOR
     void Update()
