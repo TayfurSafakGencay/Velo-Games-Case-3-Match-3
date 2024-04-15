@@ -11,21 +11,17 @@ public class AuthManager : MonoBehaviour
 
     void Awake()
     {
-        DontDestroyOnLoad(this);
         if (Instance == null)
             Instance = this;
         else
             Destroy(gameObject);
+
+        _authProvider = GetComponent<AbstractAuthProvider>();
+        _authProvider.Init();
     }
     #endregion Singleton
 
     private AbstractAuthProvider _authProvider;
-
-    void Start()
-    {
-        _authProvider = GetComponent<AbstractAuthProvider>();
-        _authProvider.Init();
-    }
 
     public string GetCurrentUserId()
     {
