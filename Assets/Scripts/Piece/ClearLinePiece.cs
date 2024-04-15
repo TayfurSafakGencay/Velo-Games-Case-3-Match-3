@@ -1,6 +1,4 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using DG.Tweening;
 using Enum;
 using UnityEngine;
@@ -12,27 +10,35 @@ namespace Piece
     public bool IsRow;
 
     public GameObject HalfRocket;
-    
+
+    public override void Activate()
+    {
+      IsRow = _piece.PieceType switch
+      {
+        PieceType.RowClear => true,
+        PieceType.ColumnClear => false,
+        PieceType.SuperRocket => false,
+        _ => throw new System.Exception("Error")
+      };
+      
+      _piece.BoardRef.IncreaseDestroyingObjectCount();
+
+      
+      StartCoroutine(BeforeDestroyEffect(0.25f));
+    }
     public override bool Clear()
     {
-      StartCoroutine(BeforeDestroyEffect(0.25f));
+      SpecialPieceDestroy();
 
       return true;
     }
 
     public override IEnumerator BeforeDestroyEffect(float time)
     {
-      IsRow = _piece.PieceType switch
-      {
-        PieceType.RowClear => true,
-        PieceType.ColumnClear => false,
-        _ => throw new System.Exception("Error")
-      };
-
       ExplosionAnimation();
 
       yield return new WaitForSeconds(time);
-      
+
       _explosionEffect.Kill();
 
       if (_piece.PieceType == PieceType.SuperRocket)
@@ -42,14 +48,12 @@ namespace Piece
       }
       else if (IsRow)
       {
-        _piece.BoardRef.RowRocket(HalfRocket, _piece.X, _piece.Y);
+        _piece.BoardRef.RowRocket(HalfRocket, _piece.X, _piece.Y, _piece.PieceType);
       }
       else if (!IsRow)
       {
-        _piece.BoardRef.ColumnRocket(HalfRocket, _piece.X, _piece.Y);
+        _piece.BoardRef.ColumnRocket(HalfRocket, _piece.X, _piece.Y, _piece.PieceType);
       }
-      
-      DirectDestroy();
     }
   }
 }

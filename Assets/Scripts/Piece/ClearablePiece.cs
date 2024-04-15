@@ -27,6 +27,8 @@ namespace Piece
             _isBeingCleared = false;
         }
 
+        public virtual void Activate() { }
+
         public virtual bool Clear()
         {
             DestroyAnimation();
@@ -56,6 +58,13 @@ namespace Piece
             Destroy(gameObject);
         }
 
+        protected void SpecialPieceDestroy()
+        {
+            _isBeingCleared = true;
+            
+            Destroy(gameObject);
+        }
+
         protected TweenerCore<Vector3, Vector3, VectorOptions> _explosionEffect;
 
         protected void ExplosionAnimation()
@@ -74,7 +83,7 @@ namespace Piece
 
         private void OnTriggerEnter2D(Collider2D other)
         {
-            _piece.BoardRef.ClearPiece(_piece.X, _piece.Y);
+            // _piece.BoardRef.ClearPiece(_piece.X, _piece.Y);
         }
 
         public virtual IEnumerator BeforeDestroyEffect(float time)
