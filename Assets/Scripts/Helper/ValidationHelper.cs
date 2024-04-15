@@ -1,3 +1,5 @@
+//Author: Tamer Erdoğan
+
 using System.Text.RegularExpressions;
 
 public class ValidationHelper
