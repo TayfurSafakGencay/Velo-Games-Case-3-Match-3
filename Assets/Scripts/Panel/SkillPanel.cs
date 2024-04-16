@@ -51,6 +51,8 @@ namespace Panel
         _skillDictionary.Add(skill.SkillKey, skill);
       }
       
+      UpdateTexts();
+      
       gameObject.SetActive(true);
       _selectColorPanel.gameObject.SetActive(false);
     }

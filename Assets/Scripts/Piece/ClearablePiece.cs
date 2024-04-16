@@ -3,6 +3,7 @@ using System.Collections;
 using DG.Tweening;
 using DG.Tweening.Core;
 using DG.Tweening.Plugins.Options;
+using Enum;
 using UnityEngine;
 
 namespace Piece
@@ -12,8 +13,6 @@ namespace Piece
         private bool _isBeingCleared;
 
         public bool IsBeingCleared => _isBeingCleared;
-
-        public bool IsStartedAnimation { get; set; } = false;
 
         protected GamePiece _piece;
 
@@ -26,8 +25,6 @@ namespace Piece
 
             _isBeingCleared = false;
         }
-
-        public virtual void Activate() { }
 
         public virtual bool Clear()
         {
@@ -67,7 +64,7 @@ namespace Piece
 
         protected TweenerCore<Vector3, Vector3, VectorOptions> _explosionEffect;
 
-        protected void ExplosionAnimation()
+        public void ExplosionAnimation()
         {
             _explosionEffect = transform.DOScale(transform.localScale * 1.25f, 0.25f)
                 .SetLoops(-1, LoopType.Yoyo) 
