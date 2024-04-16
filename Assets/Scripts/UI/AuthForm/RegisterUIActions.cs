@@ -1,5 +1,6 @@
 //Author: Tamer Erdoğan
 
+using Firebase.Analytics;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -51,6 +52,7 @@ public class RegisterUIActions : AuthUIActions
                                 SaveOnDeviceHelper.SaveUser(user);
                                 SceneManager.LoadScene(_levelSelectSceneName);
                                 canvasGroup.interactable = true;
+                                FirebaseAnalytics.LogEvent(FirebaseAnalytics.EventSignUp);
                             },
                             () =>
                             {
