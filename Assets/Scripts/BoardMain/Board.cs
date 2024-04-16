@@ -860,20 +860,20 @@ namespace BoardMain
         rocketPiece.X = _pressedPiece.X; rocketPiece.Y = _pressedPiece.Y;
         anotherPiece.X = _pressedPiece.X; anotherPiece.Y = _pressedPiece.Y;
 
-        rocketPiece.ClearableComponent.Activate();
-        anotherPiece.ClearableComponent.Activate();
+        rocketPiece.ClearableComponent.Clear();
+        anotherPiece.ClearableComponent.Clear();
       }
       else if (anotherPiece.PieceType == PieceType.Bomb)
       {
         GamePiece superRocketPiece = DestroyAndCreateNewPiece(_pressedPiece, _pressedPiece.X, _pressedPiece.Y, PieceType.SuperRocket, ColorType.Any);
-        superRocketPiece.ClearableComponent.Activate();
+        superRocketPiece.ClearableComponent.Clear();
 
         for (int x = _pressedPiece.X - 1; x <= _pressedPiece.X + 1; x++)
         {
           if (x == _pressedPiece.X || x < 0 || x >= _width) continue;
 
           GamePiece piece = DestroyAndCreateNewPiece(pieces[x, _pressedPiece.Y], x, _pressedPiece.Y, PieceType.ColumnClear, ColorType.Any);
-          piece.ClearableComponent.Activate();
+          piece.ClearableComponent.Clear();
         }
 
         for (int y = _pressedPiece.Y - 1; y <= _pressedPiece.Y + 1; y++)
@@ -881,12 +881,12 @@ namespace BoardMain
           if (y == _pressedPiece.Y || y < 0 || y >= _height) continue;
 
           GamePiece piece = DestroyAndCreateNewPiece(pieces[_pressedPiece.X, y], _pressedPiece.X, y, PieceType.RowClear, ColorType.Any);
-          piece.ClearableComponent.Activate();
+          piece.ClearableComponent.Clear();
         }
       }
       else if (anotherPiece.IsClearable() && anotherPiece.PieceType == PieceType.Normal)
       {
-        rocketPiece.ClearableComponent.Activate();
+        rocketPiece.ClearableComponent.Clear();
       }
     }
 
@@ -905,7 +905,7 @@ namespace BoardMain
       for (int i = x; i < _width; i++)
       {
         ClearPiece(i, y);
-
+        
         await Task.Delay(_waitPieceDestroying);
       }
     }
@@ -939,21 +939,40 @@ namespace BoardMain
     {
       SetObjectDestroying(true);
 
-      rainbowPiece.GetComponent<RainbowPiece>().SetPieces(rainbowPiece, anotherPiece);
+      rainbowPiece.GetComponent<RainbowPiece>().SetPieces(anotherPiece);
 
       rainbowPiece.ClearableComponent.Clear();
     }
 
-    public void ClearRainbow(GamePiece rainbowPiece, GamePiece anotherPiece)
+    public async Task ClearRainbow(GamePiece rainbowPiece, GamePiece anotherPiece, ColorType colorType)
+    {
+      await ClearRainbowTask(rainbowPiece, anotherPiece, colorType);
+      await Task.Delay(_waitToFill);
+
+      FinishDestroyingObjectCallers(0f, PieceType.Rainbow);
+      
+      Fillers();
+    }
+
+    private async Task ClearRainbowTask(GamePiece rainbowPiece, GamePiece anotherPiece, ColorType colorType)
     {
       for (int x = 0; x < _width; x++)
       {
         for (int y = 0; y < _height; y++)
         {
           if (x == rainbowPiece.X && y == rainbowPiece.Y)
+          {
             ClearPiece(x, y);
-
-          if (anotherPiece.PieceType == PieceType.Rainbow)
+          }
+          
+          if (colorType != ColorType.Any)
+          {
+            if (pieces[x, y].IsColored() && pieces[x, y].ColorComponent.Color == colorType)
+            {
+              ClearPiece(x, y);
+            }
+          }
+          else if (anotherPiece.PieceType == PieceType.Rainbow)
           {
             ClearPiece(x, y);
           }
@@ -1000,7 +1019,17 @@ namespace BoardMain
       }
     }
 
-    public void ClearBomb(GamePiece bombPiece, int radius = 1)
+    public async Task ClearBomb(GamePiece bombPiece, int radius = 1)
+    {
+      await ClearBombTask(bombPiece, radius);
+      await Task.Delay(_waitToFill * 4);
+
+      FinishDestroyingObjectCallers(0f, PieceType.Bomb);
+      
+      Fillers();
+    }
+
+    private async Task ClearBombTask(GamePiece bombPiece, int radius = 1)
     {
       for (int adjacentX = bombPiece.X - radius; adjacentX <= bombPiece.X + radius; adjacentX++)
       {
@@ -1039,6 +1068,7 @@ namespace BoardMain
         if (pieceType == PieceType.Normal) return;
 
         _destroyingObjectCount--;
+        print(_destroyingObjectCount + " =========");
 
         if (_destroyingObjectCount > 0) return;
       }
@@ -1064,7 +1094,7 @@ namespace BoardMain
       _objectDestroying = value;
     }
 
-    private const float _standardFillTime = 0.1f;
+    private const float _standardFillTime = 0.15f;
 
     public void Fillers(float newFillTime = _standardFillTime)
     {
