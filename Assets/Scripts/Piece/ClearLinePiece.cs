@@ -13,8 +13,15 @@ namespace Piece
     [SerializeField]
     private GameObject _halfRocket;
 
-    public override void Activate()
+    private bool _activated;
+
+    private bool _isShouldBeDestroy;
+
+    public void Activate()
     {
+      if (_activated) return;
+      _activated = true;
+      
       IsRow = _piece.PieceType switch
       {
         PieceType.RowClear => true,
@@ -30,6 +37,13 @@ namespace Piece
 
     public override bool Clear()
     {
+      if (!_activated)
+      {
+        _isShouldBeDestroy = true;
+        Activate();
+        return false;
+      }
+      
       SpecialPieceDestroy();
 
       return true;
@@ -56,6 +70,9 @@ namespace Piece
       {
         Task task1 = _piece.BoardRef.ColumnRocket(_halfRocket, _piece.X, _piece.Y, _piece.PieceType);
       }
+
+      if (_isShouldBeDestroy)
+        SpecialPieceDestroy();
     }
   }
 }
