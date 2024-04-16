@@ -1,6 +1,7 @@
 ﻿//Author: Şafak Gencay & Tamer Erdoğan
 
 using System.Collections.Generic;
+using Firebase.Analytics;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -47,6 +48,9 @@ namespace Panel
             _scoreText.text = finalScore.ToString();
 
             int newScore = SaveOnDeviceHelper.AddUserScore(finalScore);
+
+            FirebaseAnalytics.LogEvent(FirebaseAnalytics.EventLevelUp);
+            FirebaseAnalytics.LogEvent(FirebaseAnalytics.EventPostScore, "score", finalScore);
 
             //TODO: Update işlemi async olduğu için, burada UI tarafında bir loading
             //hazırlanmalı ve loading state'i burada true yapılmalı
