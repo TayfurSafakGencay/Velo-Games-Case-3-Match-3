@@ -77,10 +77,5 @@ namespace Piece
             _fadeAnimation.Kill();
             _explosionEffect.Kill();
         }
-
-        public virtual IEnumerator BeforeDestroyEffect(float time)
-        {
-            yield break;
-        }
     }
 }

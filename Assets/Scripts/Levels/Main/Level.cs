@@ -75,7 +75,7 @@ namespace Levels.Main
 
         protected IEnumerator WaitForGridFill()
         {
-            while (Board.IsFilling)
+            while (Board.IsFilling || Board.GetObjectDestroyingCount() > 0)
             {
                 yield return 0;
             }

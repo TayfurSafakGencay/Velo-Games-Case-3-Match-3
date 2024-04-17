@@ -44,7 +44,7 @@ namespace Piece
       return true;
     }
 
-    public override IEnumerator BeforeDestroyEffect(float time)
+    public IEnumerator BeforeDestroyEffect(float time)
     {      
       ExplosionAnimation();
 
