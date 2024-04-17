@@ -38,13 +38,12 @@ namespace Piece
         return false;
       }
       
-      print("gg");
       SpecialPieceDestroy();
 
       return true;
     }
     
-    public override IEnumerator BeforeDestroyEffect(float time)
+    public IEnumerator BeforeDestroyEffect(float time)
     {      
       ExplosionAnimation();
 

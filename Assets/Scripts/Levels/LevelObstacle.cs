@@ -39,9 +39,15 @@ namespace Levels
             base.OnMove();
 
             _movesUsed++;
+            
             Hud.SetRemaining(_numberMoves - _movesUsed);
-        
-            if (_numberMoves - _movesUsed <= 0 && _numberObstacleLeft > 0)
+            Hud.SetTargetScore(_numberObstacleLeft);
+
+            if (_numberObstacleLeft == 0)
+            {
+                GameWin();
+            }
+            else if (_numberMoves - _movesUsed <= 0 && _numberObstacleLeft > 0)
             {
                 GameLose(); 
             }

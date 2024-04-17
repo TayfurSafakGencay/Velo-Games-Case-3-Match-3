@@ -534,7 +534,7 @@ MonoBehaviour:
   ScoreFirstStar: 65000
   ScoreSecondStar: 67500
   ScoreThirdStar: 70000
-  _timeInSeconds: 1000
+  _timeInSeconds: 90
   _targetScore: 65000
 --- !u!1001 &1094543013600378007
 PrefabInstance:

@@ -19,6 +19,8 @@ namespace Piece
 
     public void Activate()
     {
+      _isShouldBeDestroy = true;
+
       if (_activated) return;
       _activated = true;
       
@@ -32,28 +34,28 @@ namespace Piece
       
       _piece.BoardRef.IncreaseDestroyingObjectCount();
       
-      StartCoroutine(BeforeDestroyEffect(0.25f));
+      BeforeDestroyEffect(250);
+      // StartCoroutine(BeforeDestroyEffect(0.25f));
     }
 
     public override bool Clear()
     {
       if (!_activated)
       {
-        _isShouldBeDestroy = true;
         Activate();
         return false;
       }
       
       SpecialPieceDestroy();
-
+    
       return true;
     }
 
-    public override IEnumerator BeforeDestroyEffect(float time)
+    public async Task BeforeDestroyEffect(int time)
     {
       ExplosionAnimation();
 
-      yield return new WaitForSeconds(time);
+      await Task.Delay(time);
 
       _explosionEffect.Kill();
 
@@ -61,18 +63,20 @@ namespace Piece
       {
         Task task1 = _piece.BoardRef.RowRocket(_halfRocket, _piece.X, _piece.Y, _piece.PieceType);
         Task task2 = _piece.BoardRef.ColumnRocket(_halfRocket, _piece.X, _piece.Y, _piece.PieceType);
+
+        await Task.WhenAll(task1, task2);
       }
       else if (IsRow)
       {
-        Task task1 = _piece.BoardRef.RowRocket(_halfRocket, _piece.X, _piece.Y, _piece.PieceType);
+        await _piece.BoardRef.RowRocket(_halfRocket, _piece.X, _piece.Y, _piece.PieceType);
       }
       else if (!IsRow)
       {
-        Task task1 = _piece.BoardRef.ColumnRocket(_halfRocket, _piece.X, _piece.Y, _piece.PieceType);
+        await _piece.BoardRef.ColumnRocket(_halfRocket, _piece.X, _piece.Y, _piece.PieceType);
       }
 
-      if (_isShouldBeDestroy)
-        SpecialPieceDestroy();
+      // if (_isShouldBeDestroy)
+      //   SpecialPieceDestroy();
     }
   }
 }

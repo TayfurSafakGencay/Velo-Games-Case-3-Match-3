@@ -695,13 +695,17 @@ namespace BoardMain
 
       if (!piece.IsClearable() || piece.ClearableComponent.IsBeingCleared) return false;
 
-      piece.ClearableComponent.Clear();
+      bool isCleared = piece.ClearableComponent.Clear();
 
-      if (piece.PieceType == PieceType.Normal)
-      {
-        StartCoroutine(StartDestroyAnimation(piece));
-      }
+      // if (piece.PieceType == PieceType.Normal)
+      // {
+      //   StartCoroutine(StartDestroyAnimation(piece));
+      // }
+      
+      Level.OnPieceCleared(piece);
 
+      if (!isCleared) return false;
+      
       SpawnNewPiece(x, y, PieceType.Empty);
       ClearObstacles(x, y);
 
@@ -712,8 +716,8 @@ namespace BoardMain
     {
       yield return new WaitForSeconds(_swapPieceTime);
 
-      Vector3 objectPosition = piece.transform.position;
-      _collectingPieceAnimation.AddObjects(objectPosition, piece);
+      // Vector3 objectPosition = piece.transform.position;
+      // _collectingPieceAnimation.AddObjects(objectPosition, piece);
     }
 
     public void ClearObstacles(int x, int y)
@@ -726,11 +730,9 @@ namespace BoardMain
           if (piece.PieceType != PieceType.Obstacle || !piece.IsClearable()) continue;
 
           bool isCleared = piece.ClearableComponent.Clear();
-
-          if (isCleared)
-          {
-            SpawnNewPiece(adjacentX, y, PieceType.Empty);
-          }
+          if (!isCleared) continue;
+          
+          SpawnNewPiece(adjacentX, y, PieceType.Empty);
         }
       }
 
@@ -857,6 +859,7 @@ namespace BoardMain
             anotherPiece.SetPieceTypeInitial(PieceType.ColumnClear, ColorType.Any);
             break;
         }
+        
         rocketPiece.X = _pressedPiece.X; rocketPiece.Y = _pressedPiece.Y;
         anotherPiece.X = _pressedPiece.X; anotherPiece.Y = _pressedPiece.Y;
 
@@ -1062,13 +1065,11 @@ namespace BoardMain
 
     public void FinishDestroyingObjectCallers(float time = _destroyingObjectTime, PieceType pieceType = PieceType.Normal)
     {
-      print(_destroyingObjectCount);
       if (_destroyingObjectCount > 0)
       {
         if (pieceType == PieceType.Normal) return;
 
         _destroyingObjectCount--;
-        print(_destroyingObjectCount + " =========");
 
         if (_destroyingObjectCount > 0) return;
       }
@@ -1087,6 +1088,11 @@ namespace BoardMain
     public void IncreaseDestroyingObjectCount()
     {
       _destroyingObjectCount++;
+    }
+    
+    public int GetObjectDestroyingCount()
+    {
+      return _destroyingObjectCount;
     }
 
     public void SetObjectDestroying(bool value)
