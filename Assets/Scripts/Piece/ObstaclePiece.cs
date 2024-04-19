@@ -25,6 +25,8 @@ namespace Piece
       {
         base.Clear();
         
+        _piece.BoardRef.Level.OnPieceCleared(_piece);
+
         return true;
       }
 

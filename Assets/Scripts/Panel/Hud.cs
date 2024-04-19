@@ -6,7 +6,7 @@ using Levels.Main;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
+using Image = UnityEngine.UI.Image;
 
 namespace Panel
 {

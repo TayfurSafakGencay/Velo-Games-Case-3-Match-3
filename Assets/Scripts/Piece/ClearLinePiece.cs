@@ -1,6 +1,5 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
+using System.Threading.Tasks;
 using DG.Tweening;
 using Enum;
 using UnityEngine;
@@ -11,45 +10,73 @@ namespace Piece
   {
     public bool IsRow;
 
-    public GameObject HalfRocket;
-    
-    public override bool Clear()
-    {
-      StartCoroutine(BeforeDestroyEffect(0.25f));
+    [SerializeField]
+    private GameObject _halfRocket;
 
-      return true;
-    }
+    private bool _activated;
 
-    public override IEnumerator BeforeDestroyEffect(float time)
+    private bool _isShouldBeDestroy;
+
+    public void Activate()
     {
+      _isShouldBeDestroy = true;
+
+      if (_activated) return;
+      _activated = true;
+      
       IsRow = _piece.PieceType switch
       {
         PieceType.RowClear => true,
         PieceType.ColumnClear => false,
+        PieceType.SuperRocket => false,
         _ => throw new System.Exception("Error")
       };
+      
+      _piece.BoardRef.IncreaseDestroyingObjectCount();
+      
+      BeforeDestroyEffect(250);
+      // StartCoroutine(BeforeDestroyEffect(0.25f));
+    }
 
+    public override bool Clear()
+    {
+      if (!_activated)
+      {
+        Activate();
+        return false;
+      }
+      
+      SpecialPieceDestroy();
+    
+      return true;
+    }
+
+    public async Task BeforeDestroyEffect(int time)
+    {
       ExplosionAnimation();
 
-      yield return new WaitForSeconds(time);
-      
+      await Task.Delay(time);
+
       _explosionEffect.Kill();
 
       if (_piece.PieceType == PieceType.SuperRocket)
       {
-        // _piece.BoardRef.RowRocket(HalfRocket, _piece.X, _piece.Y);
-        // _piece.BoardRef.ColumnRocket(_piece.X);
+        Task task1 = _piece.BoardRef.RowRocket(_halfRocket, _piece.X, _piece.Y, _piece.PieceType);
+        Task task2 = _piece.BoardRef.ColumnRocket(_halfRocket, _piece.X, _piece.Y, _piece.PieceType);
+
+        await Task.WhenAll(task1, task2);
       }
       else if (IsRow)
       {
-        _piece.BoardRef.RowRocket(HalfRocket, _piece.X, _piece.Y);
+        await _piece.BoardRef.RowRocket(_halfRocket, _piece.X, _piece.Y, _piece.PieceType);
       }
       else if (!IsRow)
       {
-        _piece.BoardRef.ColumnRocket(HalfRocket, _piece.X, _piece.Y);
+        await _piece.BoardRef.ColumnRocket(_halfRocket, _piece.X, _piece.Y, _piece.PieceType);
       }
-      
-      DirectDestroy();
+
+      // if (_isShouldBeDestroy)
+      //   SpecialPieceDestroy();
     }
   }
 }

@@ -1,11 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Enum;
 using Levels.Main;
 using Panel;
 using Piece;
 using Piece.Animation;
-using Unity.Mathematics;
 using UnityEngine;
 using Vo;
 using Random = UnityEngine.Random;
@@ -125,7 +125,7 @@ namespace BoardMain
 
     public GamePiece SpawnNewPiece(int x, int y, PieceType type)
     {
-      GameObject newPiece = Instantiate(_piecePrefabsDictionary[type], GetWorldPosition(x, y), quaternion.identity, transform);
+      GameObject newPiece = Instantiate(_piecePrefabsDictionary[type], GetWorldPosition(x, y), Quaternion.identity, transform);
 
       pieces[x, y] = newPiece.GetComponent<GamePiece>();
       pieces[x, y].Init(x, y, this, type);
@@ -695,13 +695,17 @@ namespace BoardMain
 
       if (!piece.IsClearable() || piece.ClearableComponent.IsBeingCleared) return false;
 
-      piece.ClearableComponent.Clear();
-      
-      if (piece.PieceType == PieceType.Normal)
-      {
-        StartCoroutine(StartDestroyAnimation(piece));
-      }
+      bool isCleared = piece.ClearableComponent.Clear();
 
+      // if (piece.PieceType == PieceType.Normal)
+      // {
+      //   StartCoroutine(StartDestroyAnimation(piece));
+      // }
+      
+      Level.OnPieceCleared(piece);
+
+      if (!isCleared) return false;
+      
       SpawnNewPiece(x, y, PieceType.Empty);
       ClearObstacles(x, y);
 
@@ -712,8 +716,8 @@ namespace BoardMain
     {
       yield return new WaitForSeconds(_swapPieceTime);
 
-      Vector3 objectPosition = piece.transform.position;
-      _collectingPieceAnimation.AddObjects(objectPosition, piece);
+      // Vector3 objectPosition = piece.transform.position;
+      // _collectingPieceAnimation.AddObjects(objectPosition, piece);
     }
 
     public void ClearObstacles(int x, int y)
@@ -726,11 +730,9 @@ namespace BoardMain
           if (piece.PieceType != PieceType.Obstacle || !piece.IsClearable()) continue;
 
           bool isCleared = piece.ClearableComponent.Clear();
-
-          if (isCleared)
-          {
-            SpawnNewPiece(adjacentX, y, PieceType.Empty);
-          }
+          if (!isCleared) continue;
+          
+          SpawnNewPiece(adjacentX, y, PieceType.Empty);
         }
       }
 
@@ -751,35 +753,53 @@ namespace BoardMain
       }
     }
 
+    #region Rocket
+
     [SerializeField]
     private Transform _rocketPool;
-    
+
     private readonly Queue<GameObject> objectPoolQueue = new();
-    
+
     private const float _rocketDisableTime = 1.5f;
 
-    public void RowRocket(GameObject halfRocket, int x, int y)
-    {
-      ClearPiece(x, y);
+    private const int _waitPieceDestroying = 80;
+    
+    private const int _waitToFill = 200;
 
+    public async Task RowRocket(GameObject halfRocket, int x, int y, PieceType pieceType)
+    {
       GetRocketFromPool(out GameObject leftRocket, out GameObject rightRocket, halfRocket);
+
+      SetHalfRocket(leftRocket, new Vector2(x - 1, y), Quaternion.Euler(0, 0, 90), "Left Rocket");
+      SetHalfRocket(rightRocket, new Vector2(x + 1, y), Quaternion.Euler(0, 0, 270), "Right Rocket");
+
+      Task task1 = RightClearRowRocket(x, y);
+      Task task2 = LeftClearRowRocket(x, y);
+
+      await Task.WhenAll(task1, task2);
+      await Task.Delay(_waitToFill);
       
-      SetHalfRocket(leftRocket, new Vector2(x - 1, y), Quaternion.Euler(0,0,90), "Left Rocket");
-      SetHalfRocket(rightRocket, new Vector2(x + 1, y), Quaternion.Euler(0,0,270), "Right Rocket");
-      
-      // StartCoroutine(ClearRowRocket(y, _rocketDisableTime));
+      FinishDestroyingObjectCallers(0f, pieceType);
+
+      Fillers();
     }
 
-    public void ColumnRocket(GameObject halfRocket, int x, int y)
+    public async Task ColumnRocket(GameObject halfRocket, int x, int y, PieceType pieceType)
     {
-      ClearPiece(x, y);
-      
       GetRocketFromPool(out GameObject upRocket, out GameObject downRocket, halfRocket);
-      
-      SetHalfRocket(upRocket, new Vector2(x, y + 1), Quaternion.Euler(0,0,180), "Up Rocket");
-      SetHalfRocket(downRocket, new Vector2(x, y - 1), Quaternion.Euler(0,0,0), "Down Rocket");
 
-      // StartCoroutine(ClearColumnRocket(x, _rocketDisableTime));
+      SetHalfRocket(upRocket, new Vector2(x, y + 1), Quaternion.Euler(0, 0, 180), "Up Rocket");
+      SetHalfRocket(downRocket, new Vector2(x, y - 1), Quaternion.Euler(0, 0, 0), "Down Rocket");
+
+      Task task1 = BottomClearColumnRocket(x, y);
+      Task task2 = UpperClearColumnRocket(x, y);
+
+      await Task.WhenAll(task1, task2);
+      await Task.Delay(_waitToFill);
+
+      FinishDestroyingObjectCallers(0f, pieceType);
+
+      Fillers();
     }
 
     private void SetHalfRocket(GameObject rocket, Vector2 pos, Quaternion rotation, string newName)
@@ -809,12 +829,12 @@ namespace BoardMain
 
     private GameObject CreateHalfRocket(GameObject halfRocket)
     {
-      GameObject newRocketObject = Instantiate(halfRocket, Vector3.zero, quaternion.identity, _rocketPool);
+      GameObject newRocketObject = Instantiate(halfRocket, Vector3.zero, Quaternion.identity, _rocketPool);
       newRocketObject.SetActive(false);
       newRocketObject.GetComponent<Rocket>().SetBoard(this);
-      
+
       StartCoroutine(AddToPool(_rocketDisableTime, newRocketObject));
-      
+
       return newRocketObject;
     }
 
@@ -824,27 +844,138 @@ namespace BoardMain
       objectPoolQueue.Enqueue(rocket);
     }
 
+    public void RocketSuper(GamePiece rocketPiece, GamePiece anotherPiece)
+    {
+      SetObjectDestroying(true);
+
+      if (anotherPiece.PieceType == PieceType.ColumnClear || anotherPiece.PieceType == PieceType.RowClear)
+      {
+        switch (rocketPiece.PieceType)
+        {
+          case PieceType.ColumnClear:
+            anotherPiece.SetPieceTypeInitial(PieceType.RowClear, ColorType.Any);
+            break;
+          case PieceType.RowClear:
+            anotherPiece.SetPieceTypeInitial(PieceType.ColumnClear, ColorType.Any);
+            break;
+        }
+        
+        rocketPiece.X = _pressedPiece.X; rocketPiece.Y = _pressedPiece.Y;
+        anotherPiece.X = _pressedPiece.X; anotherPiece.Y = _pressedPiece.Y;
+
+        rocketPiece.ClearableComponent.Clear();
+        anotherPiece.ClearableComponent.Clear();
+      }
+      else if (anotherPiece.PieceType == PieceType.Bomb)
+      {
+        GamePiece superRocketPiece = DestroyAndCreateNewPiece(_pressedPiece, _pressedPiece.X, _pressedPiece.Y, PieceType.SuperRocket, ColorType.Any);
+        superRocketPiece.ClearableComponent.Clear();
+
+        for (int x = _pressedPiece.X - 1; x <= _pressedPiece.X + 1; x++)
+        {
+          if (x == _pressedPiece.X || x < 0 || x >= _width) continue;
+
+          GamePiece piece = DestroyAndCreateNewPiece(pieces[x, _pressedPiece.Y], x, _pressedPiece.Y, PieceType.ColumnClear, ColorType.Any);
+          piece.ClearableComponent.Clear();
+        }
+
+        for (int y = _pressedPiece.Y - 1; y <= _pressedPiece.Y + 1; y++)
+        {
+          if (y == _pressedPiece.Y || y < 0 || y >= _height) continue;
+
+          GamePiece piece = DestroyAndCreateNewPiece(pieces[_pressedPiece.X, y], _pressedPiece.X, y, PieceType.RowClear, ColorType.Any);
+          piece.ClearableComponent.Clear();
+        }
+      }
+      else if (anotherPiece.IsClearable() && anotherPiece.PieceType == PieceType.Normal)
+      {
+        rocketPiece.ClearableComponent.Clear();
+      }
+    }
+
+    public async Task RightClearRowRocket(int x, int y)
+    {
+      for (int i = x; i >= 0; i--)
+      {
+        ClearPiece(i, y);
+
+        await Task.Delay(_waitPieceDestroying);
+      }
+    }
+
+    public async Task LeftClearRowRocket(int x, int y)
+    {
+      for (int i = x; i < _width; i++)
+      {
+        ClearPiece(i, y);
+        
+        await Task.Delay(_waitPieceDestroying);
+      }
+    }
+
+    public async Task BottomClearColumnRocket(int x, int y)
+    {
+      for (int i = y; i < _height; i++)
+      {
+        ClearPiece(x, i);
+        
+        await Task.Delay(_waitPieceDestroying);
+      }
+    }
+
+    public async Task UpperClearColumnRocket(int x, int y)
+    {
+      for (int i = y; i >= 0; i--)
+      {
+        ClearPiece(x, i);
+
+        await Task.Delay(_waitPieceDestroying);
+      }
+    }
+
+    #endregion
+
+
     private const int _chanceOfCreatingSpecialObjectByRainbow = 20;
 
     public void RainbowSuper(GamePiece rainbowPiece, GamePiece anotherPiece)
     {
       SetObjectDestroying(true);
 
-      rainbowPiece.GetComponent<RainbowPiece>().SetPieces(rainbowPiece, anotherPiece);
+      rainbowPiece.GetComponent<RainbowPiece>().SetPieces(anotherPiece);
 
       rainbowPiece.ClearableComponent.Clear();
     }
 
-    public void ClearRainbow(GamePiece rainbowPiece, GamePiece anotherPiece)
+    public async Task ClearRainbow(GamePiece rainbowPiece, GamePiece anotherPiece, ColorType colorType)
+    {
+      await ClearRainbowTask(rainbowPiece, anotherPiece, colorType);
+      await Task.Delay(_waitToFill);
+
+      FinishDestroyingObjectCallers(0f, PieceType.Rainbow);
+      
+      Fillers();
+    }
+
+    private async Task ClearRainbowTask(GamePiece rainbowPiece, GamePiece anotherPiece, ColorType colorType)
     {
       for (int x = 0; x < _width; x++)
       {
         for (int y = 0; y < _height; y++)
         {
           if (x == rainbowPiece.X && y == rainbowPiece.Y)
+          {
             ClearPiece(x, y);
-
-          if (anotherPiece.PieceType == PieceType.Rainbow)
+          }
+          
+          if (colorType != ColorType.Any)
+          {
+            if (pieces[x, y].IsColored() && pieces[x, y].ColorComponent.Color == colorType)
+            {
+              ClearPiece(x, y);
+            }
+          }
+          else if (anotherPiece.PieceType == PieceType.Rainbow)
           {
             ClearPiece(x, y);
           }
@@ -877,75 +1008,6 @@ namespace BoardMain
       }
     }
 
-    public void RocketSuper(GamePiece rocketPiece, GamePiece anotherPiece)
-    {
-      SetObjectDestroying(true);
-
-      if (anotherPiece.PieceType == PieceType.ColumnClear || anotherPiece.PieceType == PieceType.RowClear)
-      {
-        switch (rocketPiece.PieceType)
-        {
-          case PieceType.ColumnClear:
-            anotherPiece.SetPieceTypeInitial(PieceType.RowClear, ColorType.Any);
-            break;
-          case PieceType.RowClear:
-            anotherPiece.SetPieceTypeInitial(PieceType.ColumnClear, ColorType.Any);
-            break;
-        }
-
-        rocketPiece.ClearableComponent.Clear();
-        anotherPiece.ClearableComponent.Clear();
-      }
-      else if (anotherPiece.PieceType == PieceType.Bomb)
-      {
-        GamePiece superRocketPiece = DestroyAndCreateNewPiece(_pressedPiece, _pressedPiece.X, _pressedPiece.Y, PieceType.SuperRocket, ColorType.Any);
-        superRocketPiece.ClearableComponent.Clear();
-
-        for (int x = _pressedPiece.X - 1; x <= _pressedPiece.X + 1; x++)
-        {
-          if (x == _pressedPiece.X || x < 0 || x >= _width) continue;
-
-          GamePiece piece = DestroyAndCreateNewPiece(pieces[x, _pressedPiece.Y], x, _pressedPiece.Y, PieceType.ColumnClear, ColorType.Any);
-          piece.ClearableComponent.Clear();
-        }
-
-        for (int y = _pressedPiece.Y - 1; y <= _pressedPiece.Y + 1; y++)
-        {
-          if (y == _pressedPiece.Y || y < 0 || y >= _height) continue;
-
-          GamePiece piece = DestroyAndCreateNewPiece(pieces[_pressedPiece.X, y], _pressedPiece.X, y, PieceType.RowClear, ColorType.Any);
-          piece.ClearableComponent.Clear();
-        }
-      }
-      else if (anotherPiece.IsClearable() && anotherPiece.PieceType == PieceType.Normal)
-      {
-        rocketPiece.ClearableComponent.Clear();
-      }
-    }
-
-    public IEnumerator ClearRowRocket(int row, float time)
-    {
-      yield return new WaitForSeconds(time);
-
-      for (int i = 0; i < _width; i++)
-      {
-        ClearPiece(i, row);
-      }
-      print("CRR");
-      Fillers();
-    }
-    
-    public IEnumerator ClearColumnRocket(int column, float time)
-    {
-      yield return new WaitForSeconds(time);
-      
-      for (int y = 0; y < _height; y++)
-      {
-        ClearPiece(column, y);
-      }
-      print("CCR");
-      Fillers();
-    }
 
     public void Bomb(GamePiece bombPiece, GamePiece anotherPiece)
     {
@@ -960,7 +1022,17 @@ namespace BoardMain
       }
     }
 
-    public void ClearBomb(GamePiece bombPiece, int radius = 1)
+    public async Task ClearBomb(GamePiece bombPiece, int radius = 1)
+    {
+      await ClearBombTask(bombPiece, radius);
+      await Task.Delay(_waitToFill * 4);
+
+      FinishDestroyingObjectCallers(0f, PieceType.Bomb);
+      
+      Fillers();
+    }
+
+    private async Task ClearBombTask(GamePiece bombPiece, int radius = 1)
     {
       for (int adjacentX = bombPiece.X - radius; adjacentX <= bombPiece.X + radius; adjacentX++)
       {
@@ -1017,13 +1089,18 @@ namespace BoardMain
     {
       _destroyingObjectCount++;
     }
+    
+    public int GetObjectDestroyingCount()
+    {
+      return _destroyingObjectCount;
+    }
 
     public void SetObjectDestroying(bool value)
     {
       _objectDestroying = value;
     }
 
-    private const float _standardFillTime = 0.1f;
+    private const float _standardFillTime = 0.15f;
 
     public void Fillers(float newFillTime = _standardFillTime)
     {

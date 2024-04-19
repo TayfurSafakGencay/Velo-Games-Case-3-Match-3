@@ -1,5 +1,4 @@
-﻿using Unity.Mathematics;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Panel.LevelSelectMenu
 {
@@ -17,7 +16,7 @@ namespace Panel.LevelSelectMenu
         {
             for (int i = 1; i < LevelCount + 1; i++)
             {
-                LevelSelectPanelItem item = Instantiate(_levelSelectPanelItem, transform.position, quaternion.identity, _itemContainer);
+                LevelSelectPanelItem item = Instantiate(_levelSelectPanelItem, transform.position, Quaternion.identity, _itemContainer);
                 item.Init(i, PlayerPrefs.GetInt("Level " + i, 0), false);
             }
         }

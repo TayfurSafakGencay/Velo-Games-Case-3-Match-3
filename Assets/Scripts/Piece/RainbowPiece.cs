@@ -1,33 +1,49 @@
 using System.Collections;
 using DG.Tweening;
+using Enum;
 using UnityEngine;
 
 namespace Piece
 {
   public class RainbowPiece : ClearablePiece
   {
-    private GamePiece _rainbowPiece;
-
     private GamePiece _anotherPiece;
 
-    public void SetPieces(GamePiece rainbowPiece, GamePiece anotherPiece)
+    private bool _activated;
+
+    private bool _isShouldBeDestroy;
+
+    private ColorType _anotherPieceColorType;
+
+    public void SetPieces(GamePiece anotherPiece)
     {
-      _rainbowPiece = rainbowPiece;
       _anotherPiece = anotherPiece;
     }
-    public override bool Clear()
+
+    public void Activate()
     {
-      if (IsStartedAnimation) return true;
-      IsStartedAnimation = true;
+      if (_activated) return;
+      _activated = true;
       
       _piece.BoardRef.IncreaseDestroyingObjectCount();
         
-      StartCoroutine(BeforeDestroyEffect(0.5f));
+      StartCoroutine(BeforeDestroyEffect(0.25f));
+    }
+    public override bool Clear()
+    {
+      if (!_activated)
+      {
+        _isShouldBeDestroy = true;
+        Activate();
+        return false;
+      }
+      
+      SpecialPieceDestroy();
 
       return true;
     }
     
-    public override IEnumerator BeforeDestroyEffect(float time)
+    public IEnumerator BeforeDestroyEffect(float time)
     {      
       ExplosionAnimation();
 
@@ -35,14 +51,23 @@ namespace Piece
       
       _explosionEffect.Kill();
 
-      if (_rainbowPiece != null && _anotherPiece != null)
+      if (_anotherPiece == null)
       {
-        _piece.BoardRef.ClearRainbow(_rainbowPiece, _anotherPiece);
+        ColorType[] colorList = (ColorType[])System.Enum.GetValues(typeof(ColorType));
+        System.Random random = new();
+        ColorType randomColor = colorList[random.Next(0, 5)];
+
+        _anotherPieceColorType = randomColor;
+      }
+      else
+      {
+        _anotherPieceColorType = ColorType.Any;
       }
       
-      _piece.BoardRef.Fillers();
+      _piece.BoardRef.ClearRainbow(_piece, _anotherPiece, _anotherPieceColorType);
       
-      DestroyAnimation();
+      if (_isShouldBeDestroy)
+        SpecialPieceDestroy();
     }
   }
 }

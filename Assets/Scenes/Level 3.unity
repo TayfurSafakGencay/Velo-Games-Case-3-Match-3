@@ -351,7 +351,7 @@ MonoBehaviour:
   Level: {fileID: 1655098400}
   _height: 9
   _width: 9
-  _fillTime: 0.1
+  _fillTime: 0.15
   _background: {fileID: 8117264516079029217, guid: 147636c2a2f3e374d97b533809f4aba8, type: 3}
   _collectingPieceAnimation: {fileID: 276553341}
   _piecePrefabs:
@@ -534,7 +534,7 @@ MonoBehaviour:
   ScoreFirstStar: 65000
   ScoreSecondStar: 67500
   ScoreThirdStar: 70000
-  _timeInSeconds: 1000
+  _timeInSeconds: 90
   _targetScore: 65000
 --- !u!1001 &1094543013600378007
 PrefabInstance:
@@ -872,6 +872,14 @@ PrefabInstance:
       propertyPath: _board
       value: 
       objectReference: {fileID: 787276510}
+    - target: {fileID: 7655371245654096901, guid: 14d76db03b2371c469d95121eb88c5e8, type: 3}
+      propertyPath: SkillList.Array.data[0].SkillCount
+      value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 7655371245654096901, guid: 14d76db03b2371c469d95121eb88c5e8, type: 3}
+      propertyPath: SkillList.Array.data[1].SkillCount
+      value: 50
+      objectReference: {fileID: 0}
     - target: {fileID: 8511002745263933317, guid: 14d76db03b2371c469d95121eb88c5e8, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0

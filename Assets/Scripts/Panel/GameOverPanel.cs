@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿//Author: Şafak Gencay & Tamer Erdoğan
+
+using System.Collections.Generic;
+using Firebase.Analytics;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -25,7 +28,7 @@ namespace Panel
         {
             gameObject.SetActive(false);
         }
-    
+
         private void SetStars(int starCount)
         {
             for (int i = 0; i < _stars.Count; i++)
@@ -37,12 +40,30 @@ namespace Panel
         public void OnGameWin(int star, int finalScore, int level)
         {
             gameObject.SetActive(true);
-        
+
             _level = level;
             SetStars(star);
 
             _titleText.text = "You Win";
             _scoreText.text = finalScore.ToString();
+
+            int newScore = SaveOnDeviceHelper.AddUserScore(finalScore);
+
+            FirebaseAnalytics.LogEvent(FirebaseAnalytics.EventLevelUp);
+            FirebaseAnalytics.LogEvent(FirebaseAnalytics.EventPostScore, "score", finalScore);
+
+            //TODO: Update işlemi async olduğu için, burada UI tarafında bir loading
+            //hazırlanmalı ve loading state'i burada true yapılmalı
+            DatabaseManager.Instance.UpdateUserFields(
+                level,
+                newScore,
+                () => {
+                    // TODO: Kullanıcı verisi başarıyla güncellendi. UI'ın loading'i kapatılmalı
+                },
+                () => {
+                    // TODO: Kullanıcı verisi güncellenemedi. UI'ın loading'i kapatılmalı ve hata gibi birşey gösterilmeli
+                }
+            );
         }
 
         public void OnGameLose(int star, int finalScore, int level)
@@ -64,12 +85,11 @@ namespace Panel
         public void OnHome()
         {
             SceneManager.LoadScene("Level Select");
-            
         }
 
         public void OnNextLevel()
         {
-            int newLevel = _level + 1; 
+            int newLevel = _level + 1;
             SceneManager.LoadScene("Level " + newLevel);
         }
     }

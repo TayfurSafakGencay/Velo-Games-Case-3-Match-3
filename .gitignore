@@ -2,6 +2,8 @@
 #
 # Get latest from https://github.com/github/gitignore/blob/main/Unity.gitignore
 #
+.vscode/
+Assets/StreamingAssets/
 /[Ll]ibrary/
 /[Tt]emp/
 /[Oo]bj/
@@ -70,3 +72,32 @@ crashlytics-build.properties
 # Temporary auto-generated Android Assets
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
+
+packages.config
+.idea/
+
+Assets/Editor Default Resources.meta
+Assets/Editor Default Resources/
+
+Assets/ExternalDependencyManager.meta
+Assets/ExternalDependencyManager/
+
+Assets/GeneratedLocalRepo.meta
+Assets/GeneratedLocalRepo/
+
+Assets/New Flare.flare
+Assets/New Flare.flare.meta
+
+Assets/Firebase.meta
+Assets/Firebase/
+
+Assets/Plugins/Android.meta
+Assets/Plugins/Android/
+
+Assets/Plugins/iOS.meta
+Assets/Plugins/iOS/
+
+Assets/Plugins/tvOS.meta
+Assets/Plugins/tvOS/
+
+App.config

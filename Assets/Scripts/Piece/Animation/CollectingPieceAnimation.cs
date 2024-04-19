@@ -2,9 +2,7 @@ using System;
 using System.Collections.Generic;
 using DG.Tweening;
 using Enum;
-using Unity.Mathematics;
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
@@ -62,7 +60,7 @@ namespace Piece.Animation
                 {
                     AnimatedObject animObject = _animatedObjects[j];
                     
-                    newObject = Instantiate(_animatedObject, transform.position, quaternion.identity, transform);
+                    newObject = Instantiate(_animatedObject, transform.position, Quaternion.identity, transform);
                     newObject.GetComponent<Image>().sprite = animObject.AnimatedGameObjectSprite;
                     newObject.SetActive(false);
 
