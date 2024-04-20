@@ -3,7 +3,6 @@ using System.Collections;
 using DG.Tweening;
 using DG.Tweening.Core;
 using DG.Tweening.Plugins.Options;
-using Enum;
 using UnityEngine;
 
 namespace Piece
@@ -64,7 +63,7 @@ namespace Piece
 
         protected TweenerCore<Vector3, Vector3, VectorOptions> _explosionEffect;
 
-        public void ExplosionAnimation()
+        protected void ExplosionAnimation()
         {
             _explosionEffect = transform.DOScale(transform.localScale * 1.25f, 0.25f)
                 .SetLoops(-1, LoopType.Yoyo) 

@@ -13,7 +13,7 @@ namespace Piece
     [SerializeField]
     private GameObject _halfRocket;
 
-    private bool _activated;
+    private bool _activated = false;
 
     private bool _isShouldBeDestroy;
 
@@ -34,20 +34,13 @@ namespace Piece
       
       _piece.BoardRef.IncreaseDestroyingObjectCount();
       
-      BeforeDestroyEffect(250);
-      // StartCoroutine(BeforeDestroyEffect(0.25f));
+      BeforeDestroyEffect(500);
     }
 
     public override bool Clear()
     {
-      if (!_activated)
-      {
-        Activate();
-        return false;
-      }
-      
-      SpecialPieceDestroy();
-    
+      if (_activated) return true;
+      Activate();
       return true;
     }
 
@@ -56,8 +49,9 @@ namespace Piece
       ExplosionAnimation();
 
       await Task.Delay(time);
-
+      
       _explosionEffect.Kill();
+      _spriteRenderer.enabled = false;
 
       if (_piece.PieceType == PieceType.SuperRocket)
       {
@@ -75,8 +69,8 @@ namespace Piece
         await _piece.BoardRef.ColumnRocket(_halfRocket, _piece.X, _piece.Y, _piece.PieceType);
       }
 
-      // if (_isShouldBeDestroy)
-      //   SpecialPieceDestroy();
+      if (_isShouldBeDestroy)
+        SpecialPieceDestroy();
     }
   }
 }

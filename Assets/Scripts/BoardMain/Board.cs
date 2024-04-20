@@ -308,8 +308,7 @@ namespace BoardMain
 
             RocketSuper(piece1, piece2);
           }
-
-          if (piece2.PieceType == PieceType.RowClear || piece2.PieceType == PieceType.ColumnClear)
+          else if (piece2.PieceType == PieceType.RowClear || piece2.PieceType == PieceType.ColumnClear)
           {
             matchKey = MatchKey.Row;
 
@@ -695,7 +694,7 @@ namespace BoardMain
 
       if (!piece.IsClearable() || piece.ClearableComponent.IsBeingCleared) return false;
 
-      bool isCleared = piece.ClearableComponent.Clear();
+      piece.ClearableComponent.Clear();
 
       // if (piece.PieceType == PieceType.Normal)
       // {
@@ -704,7 +703,7 @@ namespace BoardMain
       
       Level.OnPieceCleared(piece);
 
-      if (!isCleared) return false;
+      // if (!isCleared) return false;
       
       SpawnNewPiece(x, y, PieceType.Empty);
       ClearObstacles(x, y);
@@ -850,14 +849,15 @@ namespace BoardMain
 
       if (anotherPiece.PieceType == PieceType.ColumnClear || anotherPiece.PieceType == PieceType.RowClear)
       {
-        switch (rocketPiece.PieceType)
+        if (rocketPiece.X == anotherPiece.X)
         {
-          case PieceType.ColumnClear:
-            anotherPiece.SetPieceTypeInitial(PieceType.RowClear, ColorType.Any);
-            break;
-          case PieceType.RowClear:
-            anotherPiece.SetPieceTypeInitial(PieceType.ColumnClear, ColorType.Any);
-            break;
+          anotherPiece.SetPieceTypeInitial(PieceType.ColumnClear, ColorType.Any);
+          rocketPiece.SetPieceTypeInitial(PieceType.RowClear, ColorType.Any);
+        }
+        else if (rocketPiece.Y == anotherPiece.Y)
+        {
+          anotherPiece.SetPieceTypeInitial(PieceType.RowClear, ColorType.Any);
+          rocketPiece.SetPieceTypeInitial(PieceType.ColumnClear, ColorType.Any);
         }
         
         rocketPiece.X = _pressedPiece.X; rocketPiece.Y = _pressedPiece.Y;

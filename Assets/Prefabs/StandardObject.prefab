@@ -152,6 +152,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: adc311dc113fdd448b4ddb3a6d08de70, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _color: 0
   _colorSprites:
   - Color: 0
     Sprite: {fileID: 21300000, guid: 8be235d4213e14a48b8249172c50db0d, type: 3}
@@ -165,7 +166,6 @@ MonoBehaviour:
     Sprite: {fileID: 21300000, guid: 9970a25005dc75644a39420d99b8a15c, type: 3}
   - Color: 5
     Sprite: {fileID: 21300000, guid: 3e4e61ac548044e43ae7ac8e8e4004d1, type: 3}
-  _color: 0
 --- !u!114 &4487855510572299118
 MonoBehaviour:
   m_ObjectHideFlags: 0
