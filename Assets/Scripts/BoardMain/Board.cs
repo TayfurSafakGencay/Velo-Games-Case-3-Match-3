@@ -711,12 +711,12 @@ namespace BoardMain
       return true;
     }
 
-    private IEnumerator StartDestroyAnimation(GamePiece piece)
+    public IEnumerator StartDestroyAnimation(GamePiece piece, int score)
     {
       yield return new WaitForSeconds(_swapPieceTime);
 
-      // Vector3 objectPosition = piece.transform.position;
-      // _collectingPieceAnimation.AddObjects(objectPosition, piece);
+      Vector3 objectPosition = piece.transform.position;
+      _collectingPieceAnimation.AddObjects(objectPosition, score);
     }
 
     public void ClearObstacles(int x, int y)

@@ -138,6 +138,9 @@ namespace Panel
                 case Level.LevelType.Timer:
                     SetTitles("Time");
                     break;
+                case Level.LevelType.Bonus:
+                    SetTitles("Time");
+                    break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(levelType), levelType, null);
             }

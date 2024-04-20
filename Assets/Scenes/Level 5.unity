@@ -270,7 +270,7 @@ Camera:
     width: 1
     height: 1
   near clip plane: 0.3
-  far clip plane: 50
+  far clip plane: 1000
   field of view: 60
   orthographic: 1
   orthographic size: 10
@@ -349,8 +349,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Level: {fileID: 1655098400}
-  _height: 5
-  _width: 5
+  _height: 9
+  _width: 9
   _fillTime: 0.15
   _background: {fileID: 8117264516079029217, guid: 147636c2a2f3e374d97b533809f4aba8, type: 3}
   _collectingPieceAnimation: {fileID: 276553341}
@@ -526,16 +526,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 1655098398}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 68ed5eb155454b8d9966c613cd8df8bc, type: 3}
+  m_Script: {fileID: 11500000, guid: a2db5dd921da48e88f8df57862118264, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   Board: {fileID: 787276510}
   Hud: {fileID: 7193549999886253107}
-  ScoreFirstStar: 4000
-  ScoreSecondStar: 5000
-  ScoreThirdStar: 6000
-  _numberMoves: 5
-  _targetScore: 4000
+  ScoreFirstStar: 1
+  ScoreSecondStar: 1
+  ScoreThirdStar: 1
+  _timeInSeconds: 10
 --- !u!1001 &1094543013600378007
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -632,6 +631,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7550999646658709050, guid: 6578e451767f9f844964a17aa118695c, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: c3e153ffa0d115d4a9db051f19de3a89, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -655,6 +658,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1375881697}
     m_Modifications:
+    - target: {fileID: 398318967068395319, guid: 60648a332bd807f4cb89f2562d4855ce, type: 3}
+      propertyPath: _hud
+      value: 
+      objectReference: {fileID: 7193549999886253107}
     - target: {fileID: 398318967068395319, guid: 60648a332bd807f4cb89f2562d4855ce, type: 3}
       propertyPath: _target
       value: 
@@ -743,6 +750,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: CollectingManagerCanvas
       objectReference: {fileID: 0}
+    - target: {fileID: 5645265748711530213, guid: 60648a332bd807f4cb89f2562d4855ce, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6486549533840302524, guid: 60648a332bd807f4cb89f2562d4855ce, type: 3}
       propertyPath: m_Camera
       value: 
@@ -778,6 +789,14 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 307584430843172289, guid: 14d76db03b2371c469d95121eb88c5e8, type: 3}
       propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 404588695891936623, guid: 14d76db03b2371c469d95121eb88c5e8, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 705788794872996003, guid: 14d76db03b2371c469d95121eb88c5e8, type: 3}
+      propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 851450474002462388, guid: 14d76db03b2371c469d95121eb88c5e8, type: 3}

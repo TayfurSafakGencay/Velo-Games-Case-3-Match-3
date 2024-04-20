@@ -14,6 +14,7 @@ namespace Levels.Main
             Timer,
             Obstacle,
             Moves,
+            Bonus
         }
 
         [Header("References")]

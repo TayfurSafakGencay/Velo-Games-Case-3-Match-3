@@ -349,8 +349,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Level: {fileID: 1655098400}
-  _height: 5
-  _width: 5
+  _height: 9
+  _width: 9
   _fillTime: 0.15
   _background: {fileID: 8117264516079029217, guid: 147636c2a2f3e374d97b533809f4aba8, type: 3}
   _collectingPieceAnimation: {fileID: 276553341}
@@ -531,11 +531,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Board: {fileID: 787276510}
   Hud: {fileID: 7193549999886253107}
-  ScoreFirstStar: 4000
-  ScoreSecondStar: 5000
-  ScoreThirdStar: 6000
-  _numberMoves: 5
-  _targetScore: 4000
+  ScoreFirstStar: 25000
+  ScoreSecondStar: 30000
+  ScoreThirdStar: 35000
+  _numberMoves: 15
+  _targetScore: 25000
 --- !u!1001 &1094543013600378007
 PrefabInstance:
   m_ObjectHideFlags: 0

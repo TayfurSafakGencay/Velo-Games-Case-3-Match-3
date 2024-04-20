@@ -123,7 +123,7 @@ MonoBehaviour:
   - PieceType: 8
     Sprite: {fileID: 21300000, guid: 23d961ca958af374a90165f0fbe7fd63, type: 3}
   - PieceType: 5
-    Sprite: {fileID: 21300000, guid: c96b1d67a897beb43beb5d6cb6e5573b, type: 3}
+    Sprite: {fileID: 21300000, guid: 23d961ca958af374a90165f0fbe7fd63, type: 3}
 --- !u!114 &-1300855292237277486
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -148,10 +148,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: adc311dc113fdd448b4ddb3a6d08de70, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _color: 6
   _colorSprites:
   - Color: 6
     Sprite: {fileID: 21300000, guid: 4d9b179b0df2868439abc0cb2986dba5, type: 3}
-  _color: 6
 --- !u!114 &3196139349088059519
 MonoBehaviour:
   m_ObjectHideFlags: 0
