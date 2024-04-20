@@ -31,7 +31,7 @@ namespace Levels.Main
     
         protected int CurrentScore { get; set; }
 
-        protected LevelType Type {  get; set; }
+        public LevelType Type {  get; protected set; }
     
         public bool DidWin { get; protected set; }
         

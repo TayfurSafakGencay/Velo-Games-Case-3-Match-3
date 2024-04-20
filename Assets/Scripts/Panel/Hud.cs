@@ -153,6 +153,9 @@ namespace Panel
 
         public void OnGameWin(int score)
         {
+            if (Level.Type == Level.LevelType.Bonus)
+                _starIdx = score;
+            
             GameOverPanel.OnGameWin(_starIdx, score, Level.LevelNumber);
 
             string levelName = SceneManager.GetActiveScene().name;
