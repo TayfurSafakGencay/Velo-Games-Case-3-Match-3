@@ -1,5 +1,5 @@
 using DB.FirestoreData;
-using DB.Helper;
+using DB.Managers;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -14,9 +14,18 @@ namespace Client.Panel.MainMenu
 
     private void Awake()
     {
-      UserFD UserFd = SaveOnDeviceHelper.GetUser();
+      DatabaseManager.Instance.GetCurrentUser(
+        (UserFD user) =>
+        {
+          _lastLevel = user.level;
+        },
+        () =>
+        {
+          Debug.Log("An error occurred while retrieving user information.");
+        });
+        
 
-      _lastLevel = UserFd.level;
+      if (_lastLevel == 0) _lastLevel = 1;
 
       PlayButtonText.text = "Level " + _lastLevel;
     }
