@@ -25,6 +25,9 @@ namespace Client.Panel
         [SerializeField]
         private GameObject LoadingPanel;
 
+        [SerializeField]
+        private Button _doneButton;
+
         private int _score;
 
         private int _level;
@@ -81,6 +84,8 @@ namespace Client.Panel
         {
             gameObject.SetActive(true);
 
+            _doneButton.interactable = false;
+            
             _level = level;
             SetStars(star);
 

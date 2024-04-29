@@ -18,16 +18,13 @@ namespace Client.Panel.MainMenu
         (UserFD user) =>
         {
           _lastLevel = user.level;
+          _lastLevel++;
+          PlayButtonText.text = "Level " + _lastLevel;
         },
         () =>
         {
           Debug.Log("An error occurred while retrieving user information.");
         });
-        
-
-      if (_lastLevel == 0) _lastLevel = 1;
-
-      PlayButtonText.text = "Level " + _lastLevel;
     }
 
     public void OnPlay()
