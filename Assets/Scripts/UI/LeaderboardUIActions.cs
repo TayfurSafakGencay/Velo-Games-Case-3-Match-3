@@ -48,11 +48,10 @@ public class LeaderboardUIActions : MonoBehaviour
                     );
 
                     Transform emailtextTransform = leaderboardItem.transform.Find("EmailText");
-                    emailtextTransform.GetComponent<TMP_Text>().text = "Email: " + user.email;
+                    emailtextTransform.GetComponent<TMP_Text>().text =/* "Email: " + */user.email;
 
                     Transform scoreTextTransform = leaderboardItem.transform.Find("ScoreText");
-                    scoreTextTransform.GetComponent<TMP_Text>().text =
-                        "Score: " + user.score.ToString();
+                    scoreTextTransform.GetComponent<TMP_Text>().text =/*"Score: " +*/ user.score.ToString();
                 }
 
                 _leaderboardLoadingPanel.SetActive(false);

@@ -3,6 +3,7 @@
 using System.Collections.Generic;
 using Firebase.Analytics;
 using TMPro;
+using Unity.Loading;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -19,6 +20,9 @@ namespace Panel
 
         [SerializeField]
         private List<Image> _stars;
+
+        [SerializeField]
+        private GameObject LoadingPanel;
 
         private int _score;
 
@@ -53,14 +57,19 @@ namespace Panel
             FirebaseAnalytics.LogEvent(FirebaseAnalytics.EventPostScore, "score", finalScore);
 
             //TODO: Update işlemi async olduğu için, burada UI tarafında bir loading
+            LoadingPanel.gameObject.SetActive(true);
+            
             //hazırlanmalı ve loading state'i burada true yapılmalı
             DatabaseManager.Instance.UpdateUserFields(
                 level,
                 newScore,
                 () => {
+                    LoadingPanel.gameObject.SetActive(false);
+                    gameObject.SetActive(true);
                     // TODO: Kullanıcı verisi başarıyla güncellendi. UI'ın loading'i kapatılmalı
                 },
                 () => {
+                    LoadingPanel.gameObject.transform.GetChild(0).GetComponent<TMPro.TextMeshProUGUI>().color = Color.red;
                     // TODO: Kullanıcı verisi güncellenemedi. UI'ın loading'i kapatılmalı ve hata gibi birşey gösterilmeli
                 }
             );
